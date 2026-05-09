@@ -1,31 +1,21 @@
 import React from 'react';
-import { Calendar, Clock, Users } from 'lucide-react';
 
 export default function StatsBar({ totalEvents }) {
+  const stats = [
+    { number: totalEvents || '—', label: 'Events Documented' },
+    { number: '10', label: 'Years Covered' },
+    { number: '4', label: 'Band Members' },
+  ];
+
   return (
-    <div className="border-y border-border bg-muted/30">
-      <div className="max-w-4xl mx-auto px-4 py-6 flex flex-wrap justify-center gap-8 md:gap-16">
-        <div className="flex items-center gap-3">
-          <Calendar className="w-5 h-5 text-accent" />
-          <div>
-            <p className="text-2xl font-bold font-mono">{totalEvents || '—'}</p>
-            <p className="text-xs text-muted-foreground uppercase tracking-wider">Events Documented</p>
+    <div style={{ background: '#F7F7F7', borderTop: '1px solid #E5E5E5', borderBottom: '1px solid #E5E5E5' }}>
+      <div className="max-w-4xl mx-auto px-6 py-8 flex flex-wrap justify-center" style={{ gap: '48px' }}>
+        {stats.map(s => (
+          <div key={s.label} style={{ textAlign: 'center' }}>
+            <p style={{ fontSize: '28px', fontWeight: 500, color: '#111111', lineHeight: 1, marginBottom: '6px' }}>{s.number}</p>
+            <p style={{ fontSize: '11px', color: '#999999', letterSpacing: '0.1em', textTransform: 'uppercase' }}>{s.label}</p>
           </div>
-        </div>
-        <div className="flex items-center gap-3">
-          <Clock className="w-5 h-5 text-accent" />
-          <div>
-            <p className="text-2xl font-bold font-mono">10</p>
-            <p className="text-xs text-muted-foreground uppercase tracking-wider">Years Covered</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-3">
-          <Users className="w-5 h-5 text-accent" />
-          <div>
-            <p className="text-2xl font-bold font-mono">4</p>
-            <p className="text-xs text-muted-foreground uppercase tracking-wider">Band Members</p>
-          </div>
-        </div>
+        ))}
       </div>
     </div>
   );

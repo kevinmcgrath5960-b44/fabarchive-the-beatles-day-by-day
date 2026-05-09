@@ -3,21 +3,16 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
-import { Plus, Pencil, Trash2, Search, Star } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+
+const btnBase = {
+  fontSize: '12px', padding: '4px 10px', border: '1px solid #E5E5E5',
+  background: '#FFFFFF', color: '#444444', cursor: 'pointer', borderRadius: '0',
+};
 
 export default function AdminEvents() {
   const { toast } = useToast();
@@ -39,77 +34,66 @@ export default function AdminEvents() {
     },
   });
 
-  const filtered = events.filter(e =>
-    (e.title || '').toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = events.filter(e => (e.title || '').toLowerCase().includes(search.toLowerCase()));
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-serif font-bold">Events</h1>
-        <Link to="/admin/events/new">
-          <Button size="sm" className="gap-1.5">
-            <Plus className="w-4 h-4" /> New Event
-          </Button>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+        <h1 style={{ fontSize: '22px', fontWeight: 600, color: '#111111' }}>Events</h1>
+        <Link to="/admin/events/new" style={{
+          display: 'inline-block', padding: '8px 16px', fontSize: '13px', fontWeight: 500,
+          background: '#C8102E', color: '#FFFFFF', textDecoration: 'none', borderRadius: '0',
+        }}>
+          + New Event
         </Link>
       </div>
 
-      <div className="relative mb-4">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-        <Input
-          placeholder="Search events..."
-          value={search}
-          onChange={e => setSearch(e.target.value)}
-          className="pl-9 h-9"
-        />
-      </div>
+      <input
+        type="text"
+        placeholder="Search events..."
+        value={search}
+        onChange={e => setSearch(e.target.value)}
+        style={{
+          width: '100%', maxWidth: '360px', height: '36px', padding: '0 12px',
+          fontSize: '13px', border: '1px solid #CCCCCC', background: '#FFFFFF',
+          outline: 'none', marginBottom: '12px', boxSizing: 'border-box',
+        }}
+      />
 
-      <p className="text-xs text-muted-foreground mb-3">{filtered.length} events</p>
+      <p style={{ fontSize: '12px', color: '#999999', marginBottom: '12px' }}>{filtered.length} events</p>
 
       {isLoading ? (
-        <div className="space-y-2">
-          {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className="h-12 bg-muted animate-pulse rounded" />
-          ))}
-        </div>
+        <div>{Array.from({ length: 6 }).map((_, i) => <div key={i} style={{ height: '40px', background: '#F5F5F5', marginBottom: '1px' }} />)}</div>
       ) : (
-        <div className="border border-border rounded overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-muted text-left">
-              <tr>
-                <th className="px-3 py-2 font-medium text-xs uppercase tracking-wider">Date</th>
-                <th className="px-3 py-2 font-medium text-xs uppercase tracking-wider">Title</th>
-                <th className="px-3 py-2 font-medium text-xs uppercase tracking-wider hidden sm:table-cell">Type</th>
-                <th className="px-3 py-2 font-medium text-xs uppercase tracking-wider w-20"></th>
+        <div style={{ border: '1px solid #E5E5E5' }}>
+          <table style={{ width: '100%', fontSize: '13px', borderCollapse: 'collapse' }}>
+            <thead>
+              <tr style={{ background: '#F7F7F7', borderBottom: '1px solid #E5E5E5' }}>
+                <th style={{ padding: '9px 12px', textAlign: 'left', fontWeight: 500, fontSize: '11px', color: '#999999', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Date</th>
+                <th style={{ padding: '9px 12px', textAlign: 'left', fontWeight: 500, fontSize: '11px', color: '#999999', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Title</th>
+                <th style={{ padding: '9px 12px', textAlign: 'left', fontWeight: 500, fontSize: '11px', color: '#999999', letterSpacing: '0.08em', textTransform: 'uppercase', display: 'table-cell' }} className="hidden sm:table-cell">Type</th>
+                <th style={{ padding: '9px 12px', width: '80px' }}></th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border">
-              {filtered.map(event => (
-                <tr key={event.id} className="hover:bg-muted/30">
-                  <td className="px-3 py-2 font-mono text-xs text-accent whitespace-nowrap">
+            <tbody>
+              {filtered.map((event, idx) => (
+                <tr key={event.id} style={{ borderBottom: '1px solid #F0F0F0', background: idx % 2 === 0 ? '#FFFFFF' : '#FAFAFA' }}>
+                  <td style={{ padding: '9px 12px', fontFamily: 'monospace', fontSize: '12px', color: '#C8102E', whiteSpace: 'nowrap' }}>
                     {event.date ? format(new Date(event.date), 'dd MMM yyyy') : '—'}
                   </td>
-                  <td className="px-3 py-2">
-                    <div className="flex items-center gap-2">
-                      {event.is_featured && <Star className="w-3 h-3 text-accent fill-accent" />}
-                      <span className="line-clamp-1">{event.title}</span>
+                  <td style={{ padding: '9px 12px', color: '#111111', maxWidth: '320px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      {event.is_featured && <span style={{ fontSize: '10px', color: '#C8102E' }}>★</span>}
+                      <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{event.title}</span>
                     </div>
                   </td>
-                  <td className="px-3 py-2 hidden sm:table-cell">
-                    {event.event_type && (
-                      <Badge variant="outline" className="text-xs">{event.event_type}</Badge>
-                    )}
+                  <td style={{ padding: '9px 12px', fontSize: '12px', color: '#666666' }} className="hidden sm:table-cell">
+                    {event.event_type || '—'}
                   </td>
-                  <td className="px-3 py-2">
-                    <div className="flex items-center gap-1">
-                      <Link to={`/admin/events/${event.id}`}>
-                        <Button variant="ghost" size="icon" className="h-7 w-7">
-                          <Pencil className="w-3.5 h-3.5" />
-                        </Button>
-                      </Link>
-                      <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => setDeleteId(event.id)}>
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </Button>
+                  <td style={{ padding: '9px 12px' }}>
+                    <div style={{ display: 'flex', gap: '4px' }}>
+                      <Link to={`/admin/events/${event.id}`} style={{ ...btnBase, textDecoration: 'none' }}>Edit</Link>
+                      <button onClick={() => setDeleteId(event.id)} style={{ ...btnBase, color: '#C8102E', borderColor: '#F0D0D0' }}>Del</button>
                     </div>
                   </td>
                 </tr>
@@ -123,11 +107,11 @@ export default function AdminEvents() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Event?</AlertDialogTitle>
-            <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
+            <AlertDialogDescription>This cannot be undone.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => deleteMutation.mutate(deleteId)} className="bg-destructive text-destructive-foreground">
+            <AlertDialogAction onClick={() => deleteMutation.mutate(deleteId)} style={{ background: '#C8102E', color: '#FFFFFF' }}>
               Delete
             </AlertDialogAction>
           </AlertDialogFooter>

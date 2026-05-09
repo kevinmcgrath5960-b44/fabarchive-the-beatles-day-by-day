@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Plus, Trash2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+
+const inputStyle = { width: '100%', height: '34px', padding: '0 10px', fontSize: '13px', border: '1px solid #CCCCCC', background: '#FFFFFF', outline: 'none', boxSizing: 'border-box' };
 
 export default function AdminPhotos() {
   const { toast } = useToast();
@@ -36,7 +34,6 @@ export default function AdminPhotos() {
     mutationFn: (id) => base44.entities.Photo.delete(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['photos'] });
-      toast({ title: 'Photo deleted' });
     },
   });
 
@@ -49,52 +46,64 @@ export default function AdminPhotos() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-serif font-bold">Photo Library</h1>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px' }}>
+        <h1 style={{ fontSize: '22px', fontWeight: 600, color: '#111111' }}>Photo Library</h1>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button size="sm" className="gap-1.5"><Plus className="w-4 h-4" /> Upload Photo</Button>
+            <button style={{ padding: '8px 16px', fontSize: '13px', fontWeight: 500, background: '#C8102E', color: '#FFFFFF', border: 'none', cursor: 'pointer' }}>
+              + Upload Photo
+            </button>
           </DialogTrigger>
           <DialogContent>
-            <DialogHeader><DialogTitle>Add Photo</DialogTitle></DialogHeader>
-            <div className="space-y-3">
-              <div className="space-y-2">
-                <Label>Upload File</Label>
-                <Input type="file" accept="image/*" onChange={handleFileUpload} />
+            <DialogHeader><DialogTitle style={{ fontSize: '16px', fontWeight: 600 }}>Add Photo</DialogTitle></DialogHeader>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div>
+                <label style={{ fontSize: '12px', color: '#444444', display: 'block', marginBottom: '5px' }}>Upload File</label>
+                <input type="file" accept="image/*" onChange={handleFileUpload} style={{ fontSize: '13px' }} />
               </div>
-              {form.url && <img src={form.url} alt="" className="h-32 object-cover rounded" />}
-              <div className="space-y-2"><Label>Title</Label><Input value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} /></div>
-              <div className="space-y-2"><Label>Caption</Label><Input value={form.caption} onChange={e => setForm({ ...form, caption: e.target.value })} /></div>
-              <div className="space-y-2"><Label>Credit</Label><Input value={form.credit} onChange={e => setForm({ ...form, credit: e.target.value })} /></div>
-              <div className="space-y-2"><Label>Tags (comma-separated)</Label><Input value={form.tags} onChange={e => setForm({ ...form, tags: e.target.value })} /></div>
-              <Button onClick={() => createMutation.mutate(form)} disabled={!form.url || createMutation.isPending}>Save Photo</Button>
+              {form.url && <img src={form.url} alt="" style={{ height: '120px', objectFit: 'cover' }} />}
+              {[['title', 'Title'], ['caption', 'Caption'], ['credit', 'Credit'], ['tags', 'Tags (comma-separated)']].map(([key, label]) => (
+                <div key={key}>
+                  <label style={{ fontSize: '12px', color: '#444444', display: 'block', marginBottom: '5px' }}>{label}</label>
+                  <input value={form[key]} onChange={e => setForm({ ...form, [key]: e.target.value })} style={inputStyle} />
+                </div>
+              ))}
+              <button
+                onClick={() => createMutation.mutate(form)}
+                disabled={!form.url || createMutation.isPending}
+                style={{ padding: '8px 16px', fontSize: '13px', background: '#C8102E', color: '#FFFFFF', border: 'none', cursor: 'pointer' }}
+              >
+                Save Photo
+              </button>
             </div>
           </DialogContent>
         </Dialog>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '12px' }}>
         {photos.map(photo => (
-          <div key={photo.id} className="group relative border border-border rounded overflow-hidden">
-            <img src={photo.url} alt={photo.title || ''} className="aspect-square object-cover w-full" />
-            <div className="p-2">
-              <p className="text-xs font-medium line-clamp-1">{photo.title || 'Untitled'}</p>
-              {photo.credit && <p className="text-xs text-muted-foreground">{photo.credit}</p>}
+          <div key={photo.id} style={{ border: '1px solid #E5E5E5', background: '#FFFFFF', position: 'relative' }}
+            onMouseEnter={e => e.currentTarget.querySelector('.del-btn').style.opacity = '1'}
+            onMouseLeave={e => e.currentTarget.querySelector('.del-btn').style.opacity = '0'}
+          >
+            <img src={photo.url} alt={photo.title || ''} style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', display: 'block' }} />
+            <div style={{ padding: '8px' }}>
+              <p style={{ fontSize: '12px', fontWeight: 500, color: '#111111', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{photo.title || 'Untitled'}</p>
+              {photo.credit && <p style={{ fontSize: '11px', color: '#999999' }}>{photo.credit}</p>}
             </div>
-            <Button
-              variant="destructive"
-              size="icon"
-              className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
+            <button
+              className="del-btn"
               onClick={() => deleteMutation.mutate(photo.id)}
+              style={{ position: 'absolute', top: '6px', right: '6px', opacity: 0, background: '#C8102E', color: '#FFFFFF', border: 'none', padding: '3px 7px', fontSize: '11px', cursor: 'pointer', transition: 'opacity 0.15s' }}
             >
-              <Trash2 className="w-3 h-3" />
-            </Button>
+              ×
+            </button>
           </div>
         ))}
       </div>
 
       {photos.length === 0 && (
-        <p className="text-center py-12 text-muted-foreground text-sm">No photos yet. Upload your first one.</p>
+        <p style={{ textAlign: 'center', padding: '60px 0', fontSize: '14px', color: '#999999' }}>No photos yet.</p>
       )}
     </div>
   );

@@ -1,10 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Search, Menu, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
 const NAV_LINKS = [
-  { label: 'Home', path: '/' },
   { label: 'Timeline', path: '/timeline' },
   { label: 'Members', path: '/members' },
   { label: 'Search', path: '/search' },
@@ -12,62 +10,73 @@ const NAV_LINKS = [
 
 export default function Navbar() {
   const location = useLocation();
-  const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <nav className="bg-primary text-primary-foreground sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="flex items-center justify-between h-14">
-          <Link to="/" className="flex items-center gap-3 group">
-            <span className="text-accent font-serif text-xl font-bold tracking-tight">◉</span>
-            <div className="leading-none">
-              <span className="text-sm font-bold tracking-widest uppercase">The Beatles</span>
-              <span className="hidden sm:inline text-xs text-primary-foreground/60 ml-2 font-light">Day by Day</span>
-            </div>
+    <nav className="w-full" style={{ background: '#111111' }}>
+      <div style={{ borderBottom: '1px solid #C8102E' }}>
+        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between" style={{ height: '52px' }}>
+          {/* Left: site name */}
+          <Link to="/" className="flex items-center gap-0 select-none">
+            <span className="text-white font-semibold" style={{ fontSize: '16px' }}>The Beatles</span>
+            <span style={{ width: '1px', height: '14px', background: '#444444', margin: '0 12px', display: 'inline-block', flexShrink: 0 }} />
+            <span style={{ fontSize: '16px', color: '#999999', fontWeight: 400 }}>Day by Day</span>
           </Link>
 
-          <div className="hidden md:flex items-center gap-1">
+          {/* Right: nav links */}
+          <div className="hidden md:flex items-center" style={{ gap: '0px' }}>
             {NAV_LINKS.map(link => (
               <Link
                 key={link.path}
                 to={link.path}
-                className={`px-3 py-1.5 text-sm font-medium rounded transition-colors ${
-                  location.pathname === link.path
-                    ? 'text-accent'
-                    : 'text-primary-foreground/70 hover:text-primary-foreground'
-                }`}
+                style={{
+                  fontSize: '14px',
+                  color: location.pathname === link.path ? '#C8102E' : '#FFFFFF',
+                  padding: '0 16px',
+                  height: '52px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  textDecoration: 'none',
+                  letterSpacing: '0.01em',
+                }}
               >
                 {link.label}
               </Link>
             ))}
-            <Link to="/search" className="ml-2 p-2 text-primary-foreground/60 hover:text-primary-foreground transition-colors">
-              <Search className="w-4 h-4" />
+            <Link
+              to="/search"
+              style={{ padding: '0 12px', height: '52px', display: 'flex', alignItems: 'center', color: '#999999' }}
+            >
+              <Search size={15} />
             </Link>
           </div>
 
-          <Button
-            variant="ghost"
-            size="icon"
-            className="md:hidden text-primary-foreground"
+          {/* Mobile hamburger */}
+          <button
+            className="md:hidden text-white"
             onClick={() => setMobileOpen(!mobileOpen)}
           >
-            {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </Button>
+            {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
         </div>
       </div>
 
+      {/* Mobile menu */}
       {mobileOpen && (
-        <div className="md:hidden border-t border-primary-foreground/10 pb-3">
+        <div style={{ background: '#111111', borderBottom: '1px solid #333333' }}>
           {NAV_LINKS.map(link => (
             <Link
               key={link.path}
               to={link.path}
               onClick={() => setMobileOpen(false)}
-              className={`block px-6 py-2.5 text-sm font-medium ${
-                location.pathname === link.path
-                  ? 'text-accent'
-                  : 'text-primary-foreground/70'
-              }`}
+              style={{
+                display: 'block',
+                padding: '12px 24px',
+                fontSize: '14px',
+                color: location.pathname === link.path ? '#C8102E' : '#CCCCCC',
+                borderBottom: '1px solid #222222',
+                textDecoration: 'none',
+              }}
             >
               {link.label}
             </Link>

@@ -5,12 +5,24 @@ const YEARS = Array.from({ length: 10 }, (_, i) => 1962 + i);
 
 export default function YearSelector() {
   return (
-    <div className="flex flex-wrap justify-center gap-2">
+    <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '6px' }}>
       {YEARS.map(year => (
         <Link
           key={year}
           to={`/timeline?year=${year}`}
-          className="px-4 py-2 border border-border text-sm font-mono font-medium hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all duration-200"
+          style={{
+            display: 'inline-block',
+            padding: '6px 14px',
+            fontSize: '13px',
+            color: '#111111',
+            border: '1px solid #CCCCCC',
+            background: '#FFFFFF',
+            textDecoration: 'none',
+            borderRadius: '2px',
+            letterSpacing: '0.01em',
+          }}
+          onMouseEnter={e => { e.target.style.background = '#111111'; e.target.style.color = '#FFFFFF'; e.target.style.borderColor = '#111111'; }}
+          onMouseLeave={e => { e.target.style.background = '#FFFFFF'; e.target.style.color = '#111111'; e.target.style.borderColor = '#CCCCCC'; }}
         >
           {year}
         </Link>

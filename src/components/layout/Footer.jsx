@@ -3,32 +3,45 @@ import { Link } from 'react-router-dom';
 
 export default function Footer() {
   return (
-    <footer className="border-t border-border bg-primary text-primary-foreground/60">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
+    <footer style={{ background: '#111111', borderTop: '1px solid #222222' }}>
+      <div className="max-w-7xl mx-auto px-6 py-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
-            <h3 className="font-serif text-lg text-primary-foreground font-semibold mb-2">The Beatles — Day by Day</h3>
-            <p className="text-sm leading-relaxed">
-              An encyclopaedic chronicle of the Beatles from 1962 to 1971, covering every recording session, performance, and milestone.
+            <div className="flex items-center gap-0 mb-3">
+              <span className="text-white font-semibold" style={{ fontSize: '15px' }}>The Beatles</span>
+              <span style={{ width: '1px', height: '12px', background: '#444444', margin: '0 10px', display: 'inline-block' }} />
+              <span style={{ fontSize: '15px', color: '#666666' }}>Day by Day</span>
+            </div>
+            <p style={{ fontSize: '13px', color: '#666666', lineHeight: '1.6' }}>
+              An encyclopaedic chronicle covering every recording session, performance, and milestone from 1962 to 1971.
             </p>
           </div>
           <div>
-            <h4 className="text-xs font-bold uppercase tracking-widest text-primary-foreground/40 mb-3">Navigate</h4>
-            <div className="space-y-1.5">
-              <Link to="/" className="block text-sm hover:text-primary-foreground transition-colors">Home</Link>
-              <Link to="/timeline" className="block text-sm hover:text-primary-foreground transition-colors">Timeline</Link>
-              <Link to="/members" className="block text-sm hover:text-primary-foreground transition-colors">Members</Link>
-              <Link to="/search" className="block text-sm hover:text-primary-foreground transition-colors">Search</Link>
+            <p style={{ fontSize: '11px', color: '#444444', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '12px' }}>Archive</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {['Timeline', 'Members', 'Search'].map(label => (
+                <Link
+                  key={label}
+                  to={`/${label.toLowerCase()}`}
+                  style={{ fontSize: '13px', color: '#888888', textDecoration: 'none' }}
+                  onMouseEnter={e => e.target.style.color = '#FFFFFF'}
+                  onMouseLeave={e => e.target.style.color = '#888888'}
+                >
+                  {label}
+                </Link>
+              ))}
             </div>
           </div>
           <div>
-            <h4 className="text-xs font-bold uppercase tracking-widest text-primary-foreground/40 mb-3">Years</h4>
-            <div className="flex flex-wrap gap-2">
+            <p style={{ fontSize: '11px', color: '#444444', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '12px' }}>Years</p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
               {Array.from({ length: 10 }, (_, i) => 1962 + i).map(year => (
                 <Link
                   key={year}
                   to={`/timeline?year=${year}`}
-                  className="text-sm hover:text-accent transition-colors"
+                  style={{ fontSize: '13px', color: '#666666', textDecoration: 'none' }}
+                  onMouseEnter={e => e.target.style.color = '#C8102E'}
+                  onMouseLeave={e => e.target.style.color = '#666666'}
                 >
                   {year}
                 </Link>
@@ -36,8 +49,8 @@ export default function Footer() {
             </div>
           </div>
         </div>
-        <div className="mt-8 pt-6 border-t border-primary-foreground/10 text-xs text-primary-foreground/30">
-          This is a fan-made historical archive. Not affiliated with Apple Corps Ltd.
+        <div style={{ marginTop: '32px', paddingTop: '20px', borderTop: '1px solid #222222', fontSize: '12px', color: '#444444' }}>
+          Fan-made historical archive. Not affiliated with Apple Corps Ltd.
         </div>
       </div>
     </footer>

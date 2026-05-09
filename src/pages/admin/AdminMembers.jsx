@@ -1,18 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
 import { useToast } from '@/components/ui/use-toast';
-import { Save, Plus } from 'lucide-react';
+
+const inputStyle = { width: '100%', height: '36px', padding: '0 10px', fontSize: '13px', border: '1px solid #CCCCCC', background: '#FFFFFF', outline: 'none', boxSizing: 'border-box' };
+const labelStyle = { fontSize: '12px', color: '#444444', fontWeight: 500, display: 'block', marginBottom: '5px' };
 
 const DEFAULT_MEMBERS = [
-  { name: 'John Lennon', role: 'Rhythm Guitar, Vocals', years_with_beatles: '1960–1970', colour_code: '#E24B4A' },
-  { name: 'Paul McCartney', role: 'Bass, Vocals', years_with_beatles: '1960–1970', colour_code: '#3B82F6' },
-  { name: 'George Harrison', role: 'Lead Guitar, Vocals', years_with_beatles: '1958–1970', colour_code: '#F59E0B' },
-  { name: 'Ringo Starr', role: 'Drums, Vocals', years_with_beatles: '1962–1970', colour_code: '#22C55E' },
+  { name: 'John Lennon', role: 'Rhythm Guitar, Vocals', years_with_beatles: '1960–1970', colour_code: '#C8102E' },
+  { name: 'Paul McCartney', role: 'Bass, Vocals', years_with_beatles: '1960–1970', colour_code: '#111111' },
+  { name: 'George Harrison', role: 'Lead Guitar, Vocals', years_with_beatles: '1958–1970', colour_code: '#111111' },
+  { name: 'Ringo Starr', role: 'Drums, Vocals', years_with_beatles: '1962–1970', colour_code: '#111111' },
 ];
 
 export default function AdminMembers() {
@@ -55,26 +53,31 @@ export default function AdminMembers() {
 
   return (
     <div>
-      <h1 className="text-2xl font-serif font-bold mb-6">Members</h1>
+      <h1 style={{ fontSize: '22px', fontWeight: 600, color: '#111111', marginBottom: '24px' }}>Members</h1>
 
       {members.length === 0 && (
-        <div className="text-center py-8 border border-dashed border-border rounded mb-6">
-          <p className="text-muted-foreground text-sm mb-3">No members yet. Initialize default members?</p>
-          <Button onClick={() => initMutation.mutate()} size="sm" className="gap-1.5">
-            <Plus className="w-4 h-4" /> Create Default Members
-          </Button>
+        <div style={{ border: '1px dashed #CCCCCC', padding: '32px', textAlign: 'center', marginBottom: '24px' }}>
+          <p style={{ fontSize: '14px', color: '#999999', marginBottom: '12px' }}>No members yet.</p>
+          <button onClick={() => initMutation.mutate()} style={{ padding: '8px 16px', fontSize: '13px', background: '#111111', color: '#FFFFFF', border: 'none', cursor: 'pointer' }}>
+            Create Default Members
+          </button>
         </div>
       )}
 
-      <div className="flex flex-col sm:flex-row gap-6">
-        <div className="sm:w-48 space-y-1">
+      <div style={{ display: 'flex', gap: '32px', alignItems: 'flex-start' }}>
+        <div style={{ width: '180px', flexShrink: 0 }}>
           {members.map(m => (
             <button
               key={m.id}
               onClick={() => setSelected(m.id)}
-              className={`w-full text-left px-3 py-2 text-sm rounded transition-colors ${
-                selected === m.id ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
-              }`}
+              style={{
+                display: 'block', width: '100%', textAlign: 'left', padding: '9px 12px',
+                fontSize: '13px', background: 'none', cursor: 'pointer',
+                border: 'none',
+                borderLeft: selected === m.id ? '3px solid #C8102E' : '3px solid transparent',
+                color: selected === m.id ? '#111111' : '#666666',
+                fontWeight: selected === m.id ? 500 : 400,
+              }}
             >
               {m.name}
             </button>
@@ -82,22 +85,24 @@ export default function AdminMembers() {
         </div>
 
         {selected && (
-          <div className="flex-1 max-w-xl space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2"><Label>Name</Label><Input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} /></div>
-              <div className="space-y-2"><Label>Role</Label><Input value={form.role} onChange={e => setForm({ ...form, role: e.target.value })} /></div>
-              <div className="space-y-2"><Label>Years</Label><Input value={form.years_with_beatles} onChange={e => setForm({ ...form, years_with_beatles: e.target.value })} /></div>
-              <div className="space-y-2"><Label>Colour Code</Label><Input value={form.colour_code} onChange={e => setForm({ ...form, colour_code: e.target.value })} type="color" /></div>
+          <div style={{ flex: 1, maxWidth: '480px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+              <div><label style={labelStyle}>Name</label><input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} style={inputStyle} /></div>
+              <div><label style={labelStyle}>Role</label><input value={form.role} onChange={e => setForm({ ...form, role: e.target.value })} style={inputStyle} /></div>
+              <div><label style={labelStyle}>Years</label><input value={form.years_with_beatles} onChange={e => setForm({ ...form, years_with_beatles: e.target.value })} style={inputStyle} /></div>
             </div>
-            <div className="space-y-2"><Label>Bio</Label><Textarea value={form.bio} onChange={e => setForm({ ...form, bio: e.target.value })} rows={6} /></div>
-            <div className="space-y-2">
-              <Label>Photo</Label>
-              <Input type="file" accept="image/*" onChange={handlePhotoUpload} />
-              {form.photo_url && <img src={form.photo_url} alt="" className="h-24 rounded" />}
+            <div style={{ marginBottom: '12px' }}>
+              <label style={labelStyle}>Bio</label>
+              <textarea value={form.bio} onChange={e => setForm({ ...form, bio: e.target.value })} rows={5} style={{ ...inputStyle, height: 'auto', padding: '8px 10px', resize: 'vertical' }} />
             </div>
-            <Button onClick={() => saveMutation.mutate()} disabled={saveMutation.isPending} className="gap-2">
-              <Save className="w-4 h-4" /> Save
-            </Button>
+            <div style={{ marginBottom: '16px' }}>
+              <label style={labelStyle}>Profile Photo</label>
+              <input type="file" accept="image/*" onChange={handlePhotoUpload} style={{ fontSize: '12px', marginBottom: '6px' }} />
+              {form.photo_url && <img src={form.photo_url} alt="" style={{ height: '80px', objectFit: 'cover', border: '1px solid #E5E5E5' }} />}
+            </div>
+            <button onClick={() => saveMutation.mutate()} disabled={saveMutation.isPending} style={{ padding: '9px 20px', fontSize: '13px', fontWeight: 500, background: '#C8102E', color: '#FFFFFF', border: 'none', cursor: 'pointer' }}>
+              {saveMutation.isPending ? 'Saving…' : 'Save Member'}
+            </button>
           </div>
         )}
       </div>

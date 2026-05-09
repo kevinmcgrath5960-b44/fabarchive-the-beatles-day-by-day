@@ -5,46 +5,61 @@ const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', '
 
 export default function TimelineSidebar({ selectedYear, selectedMonth, onYearChange, onMonthChange }) {
   return (
-    <aside className="w-full lg:w-48 shrink-0">
-      <div className="sticky top-16">
-        <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-3">Year</h3>
-        <div className="flex flex-wrap lg:flex-col gap-1 mb-6">
+    <aside style={{ width: '220px', flexShrink: 0, borderRight: '1px solid #E5E5E5', paddingRight: '0' }}>
+      <div style={{ position: 'sticky', top: '52px', paddingTop: '24px' }}>
+        <p style={{ fontSize: '11px', color: '#999999', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '8px', paddingLeft: '16px' }}>Year</p>
+        <div style={{ marginBottom: '24px' }}>
           {YEARS.map(year => (
             <button
               key={year}
               onClick={() => onYearChange(year)}
-              className={`px-3 py-1.5 text-sm font-mono text-left rounded transition-colors ${
-                selectedYear === year
-                  ? 'bg-primary text-primary-foreground font-bold'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-              }`}
+              style={{
+                display: 'block', width: '100%', textAlign: 'left',
+                padding: '7px 16px',
+                fontSize: '14px',
+                color: selectedYear === year ? '#111111' : '#666666',
+                background: 'none',
+                border: 'none',
+                borderLeft: selectedYear === year ? '3px solid #C8102E' : '3px solid transparent',
+                cursor: 'pointer',
+                fontWeight: selectedYear === year ? 500 : 400,
+                transition: 'color 0.1s',
+              }}
+              onMouseEnter={e => { if (selectedYear !== year) e.currentTarget.style.color = '#111111'; }}
+              onMouseLeave={e => { if (selectedYear !== year) e.currentTarget.style.color = '#666666'; }}
             >
               {year}
             </button>
           ))}
         </div>
 
-        <h3 className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-3">Month</h3>
-        <div className="flex flex-wrap lg:flex-col gap-1">
+        <p style={{ fontSize: '11px', color: '#999999', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '8px', paddingLeft: '16px' }}>Month</p>
+        <div>
           <button
             onClick={() => onMonthChange(null)}
-            className={`px-3 py-1.5 text-sm text-left rounded transition-colors ${
-              selectedMonth === null
-                ? 'bg-accent text-accent-foreground font-bold'
-                : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-            }`}
+            style={{
+              display: 'block', width: '100%', textAlign: 'left',
+              padding: '7px 16px', fontSize: '14px',
+              color: selectedMonth === null ? '#111111' : '#666666',
+              background: 'none', border: 'none',
+              borderLeft: selectedMonth === null ? '3px solid #C8102E' : '3px solid transparent',
+              cursor: 'pointer', fontWeight: selectedMonth === null ? 500 : 400,
+            }}
           >
-            All
+            All Months
           </button>
           {MONTHS.map((month, idx) => (
             <button
               key={idx}
               onClick={() => onMonthChange(idx + 1)}
-              className={`px-3 py-1.5 text-sm text-left rounded transition-colors ${
-                selectedMonth === idx + 1
-                  ? 'bg-accent text-accent-foreground font-bold'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-              }`}
+              style={{
+                display: 'block', width: '100%', textAlign: 'left',
+                padding: '7px 16px', fontSize: '14px',
+                color: selectedMonth === idx + 1 ? '#111111' : '#666666',
+                background: 'none', border: 'none',
+                borderLeft: selectedMonth === idx + 1 ? '3px solid #C8102E' : '3px solid transparent',
+                cursor: 'pointer', fontWeight: selectedMonth === idx + 1 ? 500 : 400,
+              }}
             >
               {month}
             </button>

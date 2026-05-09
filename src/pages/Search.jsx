@@ -1,8 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Search as SearchIcon } from 'lucide-react';
-import { Input } from '@/components/ui/input';
+import { format } from 'date-fns';
 import EventCard from '../components/shared/EventCard';
 
 export default function SearchPage() {
@@ -25,42 +24,50 @@ export default function SearchPage() {
   }, [events, query]);
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-12">
-      <h1 className="font-serif text-3xl font-bold mb-2">Search</h1>
-      <p className="text-muted-foreground text-sm mb-8">Search across all Beatles events</p>
+    <div style={{ background: '#FFFFFF', minHeight: '100vh' }}>
+      <div style={{ maxWidth: '720px', margin: '0 auto', padding: '48px 24px' }}>
+        <h1 style={{ fontSize: '28px', fontWeight: 600, color: '#111111', marginBottom: '24px' }}>Search</h1>
 
-      <div className="relative mb-8">
-        <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-        <Input
-          type="text"
-          placeholder="Search events, people, places..."
-          value={query}
-          onChange={e => setQuery(e.target.value)}
-          className="pl-10 h-12 text-base border-border"
-          autoFocus
-        />
-      </div>
-
-      {query.length >= 2 && (
-        <div>
-          <p className="text-xs text-muted-foreground mb-4 uppercase tracking-wider">
-            {results.length} result{results.length !== 1 ? 's' : ''}
-          </p>
-          {results.length === 0 ? (
-            <p className="text-center py-12 text-muted-foreground text-sm">
-              No events match "{query}"
-            </p>
-          ) : (
-            results.map(event => <EventCard key={event.id} event={event} />)
-          )}
+        <div style={{ position: 'relative', marginBottom: '32px' }}>
+          <input
+            type="text"
+            placeholder="Search events, people, places..."
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+            autoFocus
+            style={{
+              width: '100%', height: '44px', padding: '0 14px',
+              fontSize: '15px', color: '#111111',
+              border: '1px solid #CCCCCC', background: '#FFFFFF',
+              outline: 'none', borderRadius: '0',
+              boxSizing: 'border-box',
+            }}
+            onFocus={e => e.target.style.borderColor = '#111111'}
+            onBlur={e => e.target.style.borderColor = '#CCCCCC'}
+          />
         </div>
-      )}
 
-      {query.length < 2 && (
-        <p className="text-center py-12 text-muted-foreground text-sm">
-          Type at least 2 characters to search
-        </p>
-      )}
+        {query.length >= 2 && (
+          <div>
+            <p style={{ fontSize: '12px', color: '#999999', marginBottom: '20px', letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+              {results.length} result{results.length !== 1 ? 's' : ''}
+            </p>
+            {results.length === 0 ? (
+              <p style={{ fontSize: '14px', color: '#999999', textAlign: 'center', padding: '48px 0' }}>
+                No events match "{query}"
+              </p>
+            ) : (
+              results.map(event => <EventCard key={event.id} event={event} />)
+            )}
+          </div>
+        )}
+
+        {query.length < 2 && (
+          <p style={{ fontSize: '14px', color: '#BBBBBB', textAlign: 'center', padding: '48px 0' }}>
+            Type at least 2 characters to search
+          </p>
+        )}
+      </div>
     </div>
   );
 }

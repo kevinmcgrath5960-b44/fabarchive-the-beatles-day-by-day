@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Calendar, Image, FileText, Users, Settings, ChevronLeft } from 'lucide-react';
+import { Calendar, Image, FileText, Users, Settings } from 'lucide-react';
 
 const ADMIN_NAV = [
   { label: 'Events', path: '/admin', icon: Calendar },
@@ -14,15 +14,16 @@ export default function AdminLayout() {
   const location = useLocation();
 
   return (
-    <div className="min-h-screen flex">
-      <aside className="w-56 bg-primary text-primary-foreground shrink-0 hidden md:block">
-        <div className="p-4 border-b border-primary-foreground/10">
-          <Link to="/" className="flex items-center gap-2 text-primary-foreground/60 hover:text-primary-foreground text-xs transition-colors">
-            <ChevronLeft className="w-3 h-3" /> Back to site
+    <div style={{ minHeight: '100vh', display: 'flex', background: '#FFFFFF' }}>
+      {/* Sidebar */}
+      <aside style={{ width: '200px', flexShrink: 0, background: '#111111', display: 'flex', flexDirection: 'column' }} className="hidden md:flex">
+        <div style={{ padding: '20px 16px', borderBottom: '1px solid #222222' }}>
+          <Link to="/" style={{ fontSize: '12px', color: '#666666', textDecoration: 'none', display: 'block', marginBottom: '12px' }}>
+            ← Back to site
           </Link>
-          <h2 className="font-serif text-lg font-bold mt-3">Admin Panel</h2>
+          <p style={{ fontSize: '14px', fontWeight: 600, color: '#FFFFFF' }}>Admin</p>
         </div>
-        <nav className="p-2 space-y-0.5">
+        <nav style={{ padding: '8px 0', flex: 1 }}>
           {ADMIN_NAV.map(item => {
             const Icon = item.icon;
             const active = location.pathname === item.path;
@@ -30,13 +31,18 @@ export default function AdminLayout() {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex items-center gap-2.5 px-3 py-2 rounded text-sm transition-colors ${
-                  active
-                    ? 'bg-accent text-accent-foreground font-medium'
-                    : 'text-primary-foreground/60 hover:text-primary-foreground hover:bg-primary-foreground/5'
-                }`}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: '10px',
+                  padding: '9px 16px', fontSize: '13px', textDecoration: 'none',
+                  color: active ? '#FFFFFF' : '#888888',
+                  background: active ? '#222222' : 'transparent',
+                  borderLeft: active ? '3px solid #C8102E' : '3px solid transparent',
+                  transition: 'color 0.1s',
+                }}
+                onMouseEnter={e => { if (!active) e.currentTarget.style.color = '#CCCCCC'; }}
+                onMouseLeave={e => { if (!active) e.currentTarget.style.color = '#888888'; }}
               >
-                <Icon className="w-4 h-4" />
+                <Icon size={14} />
                 {item.label}
               </Link>
             );
@@ -44,27 +50,28 @@ export default function AdminLayout() {
         </nav>
       </aside>
 
-      <div className="flex-1 bg-background">
-        {/* Mobile nav */}
-        <div className="md:hidden border-b border-border p-3 flex items-center gap-2 overflow-x-auto">
+      <div style={{ flex: 1, background: '#FFFFFF', overflow: 'auto' }}>
+        {/* Mobile top nav */}
+        <div className="md:hidden" style={{ background: '#111111', padding: '0 12px', display: 'flex', gap: '0', overflowX: 'auto', borderBottom: '1px solid #C8102E' }}>
           {ADMIN_NAV.map(item => {
-            const Icon = item.icon;
             const active = location.pathname === item.path;
             return (
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded text-xs whitespace-nowrap ${
-                  active ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted'
-                }`}
+                style={{
+                  padding: '12px 12px', fontSize: '12px', textDecoration: 'none', whiteSpace: 'nowrap',
+                  color: active ? '#C8102E' : '#888888',
+                  borderBottom: active ? '2px solid #C8102E' : '2px solid transparent',
+                }}
               >
-                <Icon className="w-3.5 h-3.5" />
                 {item.label}
               </Link>
             );
           })}
         </div>
-        <div className="p-4 sm:p-6 max-w-5xl">
+
+        <div style={{ padding: '32px', maxWidth: '900px' }}>
           <Outlet />
         </div>
       </div>

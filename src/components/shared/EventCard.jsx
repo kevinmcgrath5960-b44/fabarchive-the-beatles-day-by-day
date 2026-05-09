@@ -2,60 +2,67 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import EventTypeBadge from './EventTypeBadge';
-import MemberBadge from './MemberBadge';
 
 export default function EventCard({ event, variant = 'default' }) {
   const dateStr = event.approximate_date && event.approximate_description
     ? event.approximate_description
-    : format(new Date(event.date), 'd MMMM yyyy');
+    : event.date ? format(new Date(event.date), 'd MMMM yyyy') : '';
 
   if (variant === 'featured') {
     return (
-      <Link to={`/event/${event.id}`} className="group block">
-        <article className="border border-border bg-card hover:shadow-lg transition-all duration-300 overflow-hidden">
+      <Link to={`/event/${event.id}`} style={{ textDecoration: 'none', display: 'block' }}>
+        <article style={{
+          border: '1px solid #E5E5E5',
+          background: '#FFFFFF',
+          padding: '20px',
+          height: '100%',
+        }}
+          onMouseEnter={e => e.currentTarget.style.borderColor = '#BBBBBB'}
+          onMouseLeave={e => e.currentTarget.style.borderColor = '#E5E5E5'}
+        >
           {event.photos?.[0]?.url && (
-            <div className="aspect-video overflow-hidden bg-muted">
+            <div style={{ marginBottom: '14px', overflow: 'hidden', aspectRatio: '16/9' }}>
               <img
                 src={event.photos[0].url}
                 alt={event.title}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                style={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
             </div>
           )}
-          <div className="p-5">
-            <p className="text-accent font-mono text-xs font-medium mb-2">{dateStr}</p>
-            <h3 className="font-serif text-lg font-semibold leading-snug group-hover:text-accent transition-colors">
-              {event.title}
-            </h3>
-            {event.body && (
-              <p className="text-muted-foreground text-sm mt-2 line-clamp-2">{event.body.substring(0, 150)}...</p>
-            )}
-            <div className="flex flex-wrap gap-1.5 mt-3">
-              {event.event_type && <EventTypeBadge type={event.event_type} />}
-            </div>
-          </div>
+          <p style={{ fontFamily: 'monospace', fontSize: '12px', color: '#C8102E', marginBottom: '8px' }}>{dateStr}</p>
+          <h3 style={{ fontSize: '17px', fontWeight: 500, color: '#111111', marginBottom: '8px', lineHeight: '1.4' }}>{event.title}</h3>
+          {event.body && (
+            <p style={{ fontSize: '14px', color: '#666666', marginBottom: '12px', lineHeight: '1.5' }}>
+              {event.body.substring(0, 140)}…
+            </p>
+          )}
+          {event.event_type && <EventTypeBadge type={event.event_type} />}
         </article>
       </Link>
     );
   }
 
   return (
-    <Link to={`/event/${event.id}`} className="group block">
-      <article className="flex gap-4 py-4 border-b border-border hover:bg-muted/30 transition-colors px-2 -mx-2 rounded">
-        <div className="shrink-0 w-24 text-right">
-          <p className="text-accent font-mono text-sm font-medium">{dateStr}</p>
+    <Link to={`/event/${event.id}`} style={{ textDecoration: 'none', display: 'block' }}>
+      <article style={{ padding: '14px 0', borderBottom: '1px solid #F0F0F0', display: 'flex', gap: '20px', alignItems: 'flex-start' }}
+        onMouseEnter={e => e.currentTarget.querySelector('h3').style.color = '#C8102E'}
+        onMouseLeave={e => e.currentTarget.querySelector('h3').style.color = '#111111'}
+      >
+        <div style={{ flexShrink: 0, width: '110px' }}>
+          <p style={{ fontFamily: 'monospace', fontSize: '12px', color: '#C8102E', lineHeight: '1.4' }}>{dateStr}</p>
         </div>
-        <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-sm group-hover:text-accent transition-colors leading-snug">
-            {event.title}
-          </h3>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <h3 style={{ fontSize: '15px', fontWeight: 500, color: '#111111', marginBottom: '4px', lineHeight: '1.4', transition: 'color 0.1s' }}>{event.title}</h3>
           {event.body && (
-            <p className="text-muted-foreground text-xs mt-1 line-clamp-2">{event.body.substring(0, 120)}</p>
+            <p style={{ fontSize: '13px', color: '#666666', lineHeight: '1.5', overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 1, WebkitBoxOrient: 'vertical' }}>
+              {event.body.substring(0, 150)}
+            </p>
           )}
-          <div className="flex flex-wrap gap-1.5 mt-2">
-            {event.event_type && <EventTypeBadge type={event.event_type} />}
-            {event.members?.map(m => <MemberBadge key={m} name={m} />)}
-          </div>
+          {event.event_type && (
+            <div style={{ marginTop: '6px' }}>
+              <EventTypeBadge type={event.event_type} />
+            </div>
+          )}
         </div>
       </article>
     </Link>
