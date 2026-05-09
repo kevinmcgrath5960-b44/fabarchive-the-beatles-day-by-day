@@ -17,7 +17,7 @@ export default function Navbar() {
       <div style={{ borderBottom: '1px solid #C8102E' }}>
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between" style={{ height: '52px' }}>
           {/* Left: site name */}
-          <Link to="/" className="flex items-center gap-0 select-none">
+          <Link to="/" className="flex items-center gap-0 select-none" style={{ outline: 'none' }}>
             <span className="text-white font-semibold" style={{ fontSize: '16px' }}>The Beatles</span>
             <span style={{ width: '1px', height: '14px', background: '#444444', margin: '0 12px', display: 'inline-block', flexShrink: 0 }} />
             <span style={{ fontSize: '16px', color: '#999999', fontWeight: 400 }}>Day by Day</span>
