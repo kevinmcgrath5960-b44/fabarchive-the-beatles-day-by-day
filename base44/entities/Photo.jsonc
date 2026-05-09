@@ -1,0 +1,40 @@
+{
+  "name": "Photo",
+  "type": "object",
+  "properties": {
+    "url": {
+      "type": "string",
+      "description": "Photo URL"
+    },
+    "title": {
+      "type": "string",
+      "description": "Photo title"
+    },
+    "caption": {
+      "type": "string",
+      "description": "Photo caption"
+    },
+    "credit": {
+      "type": "string",
+      "description": "Photo credit/source"
+    },
+    "year": {
+      "type": "number",
+      "description": "Year the photo was taken"
+    },
+    "month": {
+      "type": "number",
+      "description": "Month the photo was taken"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Tags for the photo"
+    }
+  },
+  "required": [
+    "url"
+  ]
+}

@@ -1,0 +1,30 @@
+{
+  "name": "MonthOverview",
+  "type": "object",
+  "properties": {
+    "year": {
+      "type": "number",
+      "description": "Year (1962-1971)"
+    },
+    "month": {
+      "type": "number",
+      "description": "Month (1-12)"
+    },
+    "overview_text": {
+      "type": "string",
+      "description": "Overview text for this month in markdown"
+    },
+    "cover_photo_url": {
+      "type": "string",
+      "description": "Cover photo URL for this month"
+    },
+    "key_themes": {
+      "type": "string",
+      "description": "Key themes for this month"
+    }
+  },
+  "required": [
+    "year",
+    "month"
+  ]
+}

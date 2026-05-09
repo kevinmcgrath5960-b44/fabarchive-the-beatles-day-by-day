@@ -1,0 +1,30 @@
+{
+  "name": "SiteSettings",
+  "type": "object",
+  "properties": {
+    "site_title": {
+      "type": "string",
+      "description": "Site title"
+    },
+    "tagline": {
+      "type": "string",
+      "description": "Site tagline"
+    },
+    "accent_colour": {
+      "type": "string",
+      "description": "Accent colour hex code"
+    },
+    "on_this_day_enabled": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether On This Day is enabled"
+    },
+    "hero_intro_text": {
+      "type": "string",
+      "description": "Hero intro text for homepage"
+    }
+  },
+  "required": [
+    "site_title"
+  ]
+}

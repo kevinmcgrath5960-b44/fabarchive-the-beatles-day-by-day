@@ -1,0 +1,88 @@
+{
+  "name": "Event",
+  "type": "object",
+  "properties": {
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "The date of the event"
+    },
+    "approximate_date": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the date is approximate"
+    },
+    "approximate_description": {
+      "type": "string",
+      "description": "Description for approximate dates, e.g. 'Early January 1962'"
+    },
+    "title": {
+      "type": "string",
+      "description": "Event headline"
+    },
+    "body": {
+      "type": "string",
+      "description": "Full event description in markdown"
+    },
+    "event_type": {
+      "type": "string",
+      "enum": [
+        "Recording Session",
+        "Live Performance",
+        "Business/Management",
+        "Apple Corps",
+        "Solo Work",
+        "Personal",
+        "Release",
+        "Media Appearance",
+        "Travel"
+      ],
+      "description": "Type of event"
+    },
+    "members": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Members involved"
+    },
+    "is_featured": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether this event is featured on the homepage"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Tags for the event"
+    },
+    "sources": {
+      "type": "string",
+      "description": "Sources and references"
+    },
+    "photos": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "caption": {
+            "type": "string"
+          },
+          "credit": {
+            "type": "string"
+          }
+        }
+      },
+      "description": "Photos associated with this event"
+    }
+  },
+  "required": [
+    "date",
+    "title"
+  ]
+}

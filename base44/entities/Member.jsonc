@@ -1,0 +1,33 @@
+{
+  "name": "Member",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Member name"
+    },
+    "role": {
+      "type": "string",
+      "description": "Role in the band"
+    },
+    "years_with_beatles": {
+      "type": "string",
+      "description": "Years active with the Beatles"
+    },
+    "bio": {
+      "type": "string",
+      "description": "Biography in markdown"
+    },
+    "photo_url": {
+      "type": "string",
+      "description": "Profile photo URL"
+    },
+    "colour_code": {
+      "type": "string",
+      "description": "Hex colour code for this member"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}
