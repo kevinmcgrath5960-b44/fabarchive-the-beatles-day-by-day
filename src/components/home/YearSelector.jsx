@@ -5,7 +5,7 @@ const YEARS = Array.from({ length: 10 }, (_, i) => 1962 + i);
 
 export default function YearSelector() {
   return (
-    <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '6px' }}>
+    <div style={{ display: 'flex', flexWrap: 'nowrap', justifyContent: 'center', gap: '6px', overflowX: 'auto' }}>
       {YEARS.map(year => (
         <Link
           key={year}

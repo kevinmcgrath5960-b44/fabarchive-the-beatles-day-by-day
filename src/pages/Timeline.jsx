@@ -49,8 +49,6 @@ export default function Timeline() {
   return (
     <div style={{ minHeight: '100vh', background: '#FFFFFF' }}>
       <div className="max-w-7xl mx-auto px-6 py-8">
-        <h1 style={{ fontSize: '22px', fontWeight: 600, color: '#111111', marginBottom: '24px' }}>Timeline</h1>
-
         <div style={{ display: 'flex', gap: '0', alignItems: 'flex-start' }}>
           <TimelineSidebar
             selectedYear={selectedYear}
@@ -59,7 +57,7 @@ export default function Timeline() {
             onMonthChange={setSelectedMonth}
           />
 
-          <div style={{ flex: 1, minWidth: 0, paddingLeft: '32px', borderLeft: 'none' }}>
+          <div style={{ flex: 1, minWidth: 0, paddingLeft: '32px', borderLeft: '1px solid #E5E5E5' }}>
             <h2 style={{ fontSize: '22px', fontWeight: 500, color: '#111111', marginBottom: '6px' }}>{monthTitle}</h2>
 
             {currentOverview?.overview_text && (
