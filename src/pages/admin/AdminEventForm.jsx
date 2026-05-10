@@ -104,8 +104,8 @@ export default function AdminEventForm() {
 
       <form onSubmit={e => { e.preventDefault(); saveMutation.mutate(form); }}>
 
-        {/* ── Two-column layout: metadata left, body right ─────────────────── */}
-        <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: '40px', alignItems: 'flex-start' }}>
+        {/* ── Row 1: metadata left · title right ──────────────────────────── */}
+        <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: '40px', alignItems: 'flex-start', marginBottom: '32px' }}>
 
           {/* ── LEFT: Metadata ──────────────────────────────────────────────── */}
           <div>
@@ -219,7 +219,7 @@ export default function AdminEventForm() {
             </button>
           </div>
 
-          {/* ── RIGHT: Title + Body editor ──────────────────────────────────── */}
+          {/* ── RIGHT: Title ────────────────────────────────────────────────── */}
           <div>
             <div style={fieldStyle}>
               <label style={labelStyle}>Title</label>
@@ -231,23 +231,25 @@ export default function AdminEventForm() {
                 placeholder="Event headline"
               />
             </div>
-
-            <div style={fieldStyle}>
-              <label style={labelStyle}>
-                Body
-                <span style={{ color: '#999', fontWeight: 400, marginLeft: '6px' }}>
-                  — supports markdown · inline images: <code style={{ fontSize: '11px', background: '#f4f4f4', padding: '1px 5px' }}>![caption|right](url)</code>
-                </span>
-              </label>
-              <MarkdownEditor
-                value={form.body || ''}
-                onChange={val => setForm({ ...form, body: val })}
-                rows={28}
-                placeholder="Full event description…"
-              />
-            </div>
           </div>
         </div>
+
+        {/* ── Row 2: Full-width Body editor ───────────────────────────────── */}
+        <div style={fieldStyle}>
+          <label style={labelStyle}>
+            Body
+            <span style={{ color: '#999', fontWeight: 400, marginLeft: '6px' }}>
+              — supports markdown · inline images: <code style={{ fontSize: '11px', background: '#f4f4f4', padding: '1px 5px' }}>![caption|right](url)</code>
+            </span>
+          </label>
+          <MarkdownEditor
+            value={form.body || ''}
+            onChange={val => setForm({ ...form, body: val })}
+            rows={30}
+            placeholder="Full event description…"
+          />
+        </div>
+
       </form>
     </div>
   );
