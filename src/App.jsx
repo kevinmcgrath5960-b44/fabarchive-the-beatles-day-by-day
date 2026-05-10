@@ -4,6 +4,7 @@ import { queryClientInstance } from '@/lib/query-client'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
+import { PhaseProvider } from '@/lib/PhaseContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 
 import PublicLayout from './components/layout/PublicLayout';
@@ -68,12 +69,7 @@ function App() {
     <AuthProvider>
       <QueryClientProvider client={queryClientInstance}>
         <Router>
-          <AuthenticatedApp />
-        </Router>
-        <Toaster />
-      </QueryClientProvider>
-    </AuthProvider>
-  )
-}
-
-export default App
+          <PhaseProvider>
+            <AuthenticatedApp />
+          </PhaseProvider>
+        <
