@@ -9,6 +9,23 @@ import MemberBadge from '../components/shared/MemberBadge';
 import { getPhaseForYear } from '@/lib/phases';
 import { usePhase } from '@/lib/PhaseContext';
 
+// ── Parse inline image alt text for size hints ────────────────────────────────
+// Syntax: ![My caption|half](url)  →  caption="My caption", size="half"
+// Supported sizes: full (default), half, third, right, left
+function parseImageAlt(alt = '') {
+  const [caption, sizeHint] = alt.split('|').map(s => s.trim());
+  return { caption, size: sizeHint?.toLowerCase() || 'full' };
+}
+
+// Width + layout per size token
+const IMAGE_SIZE_STYLES = {
+  full:  { wrapper: { width: '100%', margin: '2em 0', clear: 'both' } },
+  half:  { wrapper: { width: '50%', margin: '2em auto', display: 'block', clear: 'both' } },
+  third: { wrapper: { width: '33.333%', margin: '2em auto', display: 'block', clear: 'both' } },
+  right: { wrapper: { width: '40%', float: 'right', margin: '0.4em 0 1.2em 2em' } },
+  left:  { wrapper: { width: '40%', float: 'left',  margin: '0.4em 2em 1.2em 0' } },
+};
+
 export default function EventDetail() {
   const eventId = window.location.pathname.split('/event/')[1];
   const { setPhaseId } = usePhase();
@@ -28,14 +45,13 @@ export default function EventDetail() {
   });
 
   const sortedEvents = [...allEvents].sort((a, b) => (a.date || '').localeCompare(b.date || ''));
-  const currentIdx = sortedEvents.findIndex(e => String(e.id) === String(eventId));
-  const prevEvent = currentIdx > 0 ? sortedEvents[currentIdx - 1] : null;
-  const nextEvent = currentIdx < sortedEvents.length - 1 ? sortedEvents[currentIdx + 1] : null;
+  const currentIdx  = sortedEvents.findIndex(e => String(e.id) === String(eventId));
+  const prevEvent   = currentIdx > 0 ? sortedEvents[currentIdx - 1] : null;
+  const nextEvent   = currentIdx < sortedEvents.length - 1 ? sortedEvents[currentIdx + 1] : null;
 
-  const year = event?.date ? new Date(event.date).getFullYear() : null;
+  const year  = event?.date ? new Date(event.date).getFullYear() : null;
   const phase = year ? getPhaseForYear(year) : null;
 
-  // Sync Navbar when phase is known; reset on unmount
   useEffect(() => {
     if (phase) {
       setPhaseId(phase.id);
@@ -43,7 +59,7 @@ export default function EventDetail() {
     }
   }, [phase?.id, setPhaseId]);
 
-  // ── Loading skeleton ────────────────────────────────────────────────────────
+  // ── Loading skeleton ──────────────────────────────────────────────────────────
   if (isLoading) {
     return (
       <div style={{ background: '#F4ECDC', minHeight: '100vh' }}>
@@ -73,34 +89,55 @@ export default function EventDetail() {
     ? event.approximate_description
     : format(new Date(event.date), 'EEEE, d MMMM yyyy');
 
-  // Compound class: softer detail palette + phase identity
   const rootClass = `phase-${phase.id} phase-detail`;
+
+  // ── Inline image renderer for ReactMarkdown ───────────────────────────────────
+  const InlineImage = ({ src, alt }) => {
+    const { caption, size } = parseImageAlt(alt);
+    const { wrapper } = IMAGE_SIZE_STYLES[size] || IMAGE_SIZE_STYLES.full;
+    return (
+      <figure style={{ margin: 0, ...wrapper }}>
+        <img
+          src={src}
+          alt={caption}
+          style={{ width: '100%', display: 'block' }}
+        />
+        {caption && (
+          <figcaption style={{
+            fontSize: '11px',
+            color: 'var(--phase-muted)',
+            background: 'var(--phase-surface)',
+            padding: '8px 12px',
+            fontFamily: '"Inter", sans-serif',
+            lineHeight: 1.5,
+            fontStyle: 'italic',
+          }}>
+            {caption}
+          </figcaption>
+        )}
+      </figure>
+    );
+  };
 
   return (
     <div
       className={rootClass}
       style={{ background: 'var(--phase-bg)', minHeight: '100vh', transition: 'background 0.5s' }}
     >
-      {/* ── Header band ─────────────────────────────────────────────────────── */}
+      {/* ── Header band ──────────────────────────────────────────────────────── */}
       <div style={{ background: 'var(--phase-header-bg)' }}>
         <div style={{
-          maxWidth: '900px', margin: '0 auto',
-          padding: '13px 40px',
+          maxWidth: '900px', margin: '0 auto', padding: '13px 40px',
           display: 'flex', alignItems: 'center',
-          justifyContent: 'space-between', gap: '20px',
-          flexWrap: 'wrap',
+          justifyContent: 'space-between', gap: '20px', flexWrap: 'wrap',
         }}>
           <Link
             to="/timeline"
             style={{
-              fontSize: '11px',
-              color: 'var(--phase-header-ink)',
-              textDecoration: 'none',
-              letterSpacing: '0.08em',
-              textTransform: 'uppercase',
-              fontFamily: '"Inter", sans-serif',
-              opacity: 0.65,
-              display: 'inline-flex', alignItems: 'center', gap: '6px',
+              fontSize: '11px', color: 'var(--phase-header-ink)',
+              textDecoration: 'none', letterSpacing: '0.08em',
+              textTransform: 'uppercase', fontFamily: '"Inter", sans-serif',
+              opacity: 0.65, display: 'inline-flex', alignItems: 'center', gap: '6px',
               transition: 'opacity 0.15s',
             }}
             onMouseEnter={e => e.currentTarget.style.opacity = '1'}
@@ -108,30 +145,23 @@ export default function EventDetail() {
           >
             ← Timeline
           </Link>
-
           <span style={{
-            fontSize: '10px',
-            color: 'var(--phase-header-ink)',
-            letterSpacing: '0.12em',
-            textTransform: 'uppercase',
-            fontFamily: '"Inter", sans-serif',
-            opacity: 0.5,
+            fontSize: '10px', color: 'var(--phase-header-ink)',
+            letterSpacing: '0.12em', textTransform: 'uppercase',
+            fontFamily: '"Inter", sans-serif', opacity: 0.5,
           }}>
             {phase.label}&ensp;·&ensp;{phase.years}
           </span>
-
           <span style={{
-            fontSize: '12px',
-            fontFamily: phase.fonts.mono,
-            color: 'var(--phase-header-ink)',
-            opacity: 0.75,
+            fontSize: '12px', fontFamily: phase.fonts.mono,
+            color: 'var(--phase-header-ink)', opacity: 0.75,
           }}>
             {dateStr}
           </span>
         </div>
       </div>
 
-      {/* ── Article body ────────────────────────────────────────────────────── */}
+      {/* ── Article body ─────────────────────────────────────────────────────── */}
       <div style={{ maxWidth: '720px', margin: '0 auto', padding: '52px 40px 88px' }}>
 
         {/* Title */}
@@ -162,12 +192,9 @@ export default function EventDetail() {
           )}
           {event.tags?.map(tag => (
             <span key={tag} style={{
-              fontSize: '10px',
-              color: 'var(--phase-muted)',
-              border: '1px solid var(--phase-muted)',
-              padding: '2px 8px',
-              fontFamily: '"Inter", sans-serif',
-              letterSpacing: '0.06em',
+              fontSize: '10px', color: 'var(--phase-muted)',
+              border: '1px solid var(--phase-muted)', padding: '2px 8px',
+              fontFamily: '"Inter", sans-serif', letterSpacing: '0.06em',
               textTransform: 'uppercase',
             }}>
               {tag}
@@ -175,51 +202,98 @@ export default function EventDetail() {
           ))}
         </div>
 
-        {/* Photos */}
+        {/* Top photos — from the photos array, with optional size control */}
         {event.photos && event.photos.length > 0 && (
           <div style={{ marginBottom: '40px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {event.photos.map((photo, i) => (
-              <figure key={i} style={{ margin: 0 }}>
-                <img
-                  src={photo.url}
-                  alt={photo.caption || event.title}
-                  style={{ width: '100%', display: 'block' }}
-                />
-                {(photo.caption || photo.credit) && (
-                  <figcaption style={{
-                    padding: '10px 14px',
-                    fontSize: '11px',
-                    color: 'var(--phase-muted)',
-                    background: 'var(--phase-surface)',
-                    fontFamily: '"Inter", sans-serif',
-                    lineHeight: 1.5,
-                  }}>
-                    {photo.caption}
-                    {photo.credit && <em style={{ opacity: 0.8 }}> — {photo.credit}</em>}
-                  </figcaption>
-                )}
-              </figure>
-            ))}
+            {event.photos.map((photo, i) => {
+              const sizeKey = photo.size || 'full';
+              const widthMap = { full: '100%', half: '50%', third: '33.333%' };
+              const width = widthMap[sizeKey] || '100%';
+              return (
+                <figure key={i} style={{ margin: '0 auto', width }}>
+                  <img
+                    src={photo.url}
+                    alt={photo.caption || event.title}
+                    style={{ width: '100%', display: 'block' }}
+                  />
+                  {(photo.caption || photo.credit) && (
+                    <figcaption style={{
+                      padding: '10px 14px', fontSize: '11px',
+                      color: 'var(--phase-muted)', background: 'var(--phase-surface)',
+                      fontFamily: '"Inter", sans-serif', lineHeight: 1.5,
+                      fontStyle: 'italic',
+                    }}>
+                      {photo.caption}
+                      {photo.credit && <em style={{ opacity: 0.8 }}> — {photo.credit}</em>}
+                    </figcaption>
+                  )}
+                </figure>
+              );
+            })}
           </div>
         )}
 
-        {/* Body text — first paragraph gets drop cap via .phase-drop-cap */}
+        {/* Body text with full markdown support */}
         {event.body && (
           <div
             className="phase-drop-cap"
             style={{
-              fontSize: '15px',
-              color: 'var(--phase-ink)',
-              lineHeight: 1.85,
-              fontFamily: phase.fonts.body,
+              fontSize: '15px', color: 'var(--phase-ink)',
+              lineHeight: 1.85, fontFamily: phase.fonts.body,
               fontWeight: phase.weights.body,
             }}
           >
             <ReactMarkdown
               components={{
+                // ── Block elements ──────────────────────────────────────────
                 p: ({ children }) => (
                   <p style={{ marginBottom: '1.5em' }}>{children}</p>
                 ),
+
+                h2: ({ children }) => (
+                  <h2 style={{
+                    fontFamily: phase.fonts.display,
+                    fontSize: '24px',
+                    fontWeight: phase.weights.display,
+                    color: 'var(--phase-ink)',
+                    lineHeight: 1.25,
+                    letterSpacing: phase.headlineTracking,
+                    margin: '2.2em 0 0.7em',
+                    paddingBottom: '0.4em',
+                    borderBottom: '1px solid var(--phase-surface)',
+                  }}>
+                    {children}
+                  </h2>
+                ),
+
+                h3: ({ children }) => (
+                  <h3 style={{
+                    fontFamily: phase.fonts.display,
+                    fontSize: '18px',
+                    fontWeight: phase.weights.display,
+                    color: 'var(--phase-ink)',
+                    lineHeight: 1.3,
+                    letterSpacing: phase.headlineTracking,
+                    margin: '1.8em 0 0.5em',
+                  }}>
+                    {children}
+                  </h3>
+                ),
+
+                h4: ({ children }) => (
+                  <h4 style={{
+                    fontFamily: '"Inter", sans-serif',
+                    fontSize: '11px',
+                    fontWeight: 700,
+                    color: 'var(--phase-muted)',
+                    letterSpacing: '0.12em',
+                    textTransform: 'uppercase',
+                    margin: '1.6em 0 0.4em',
+                  }}>
+                    {children}
+                  </h4>
+                ),
+
                 blockquote: ({ children }) => (
                   <blockquote style={{
                     borderLeft: '3px solid var(--phase-accent)',
@@ -231,11 +305,68 @@ export default function EventDetail() {
                     {children}
                   </blockquote>
                 ),
+
+                hr: () => (
+                  <hr style={{
+                    border: 'none',
+                    borderTop: '1px solid var(--phase-surface)',
+                    margin: '2.5em 0',
+                  }} />
+                ),
+
+                ul: ({ children }) => (
+                  <ul style={{
+                    paddingLeft: '1.4em', marginBottom: '1.5em',
+                    color: 'var(--phase-ink)',
+                  }}>
+                    {children}
+                  </ul>
+                ),
+
+                ol: ({ children }) => (
+                  <ol style={{
+                    paddingLeft: '1.4em', marginBottom: '1.5em',
+                    color: 'var(--phase-ink)',
+                  }}>
+                    {children}
+                  </ol>
+                ),
+
+                li: ({ children }) => (
+                  <li style={{ marginBottom: '0.4em', lineHeight: 1.7 }}>{children}</li>
+                ),
+
+                // ── Inline images with size hints ───────────────────────────
+                img: ({ src, alt }) => <InlineImage src={src} alt={alt} />,
+
+                // ── Inline elements ─────────────────────────────────────────
                 strong: ({ children }) => (
                   <strong style={{ color: 'var(--phase-ink)', fontWeight: 600 }}>{children}</strong>
                 ),
+
                 em: ({ children }) => (
                   <em style={{ color: 'var(--phase-ink)', fontStyle: 'italic' }}>{children}</em>
+                ),
+
+                a: ({ href, children }) => (
+                  <a href={href} style={{
+                    color: 'var(--phase-accent)', textDecoration: 'underline',
+                    textUnderlineOffset: '3px',
+                  }}>
+                    {children}
+                  </a>
+                ),
+
+                code: ({ children }) => (
+                  <code style={{
+                    fontFamily: '"JetBrains Mono", monospace',
+                    fontSize: '13px',
+                    background: 'var(--phase-surface)',
+                    padding: '1px 6px',
+                    color: 'var(--phase-accent)',
+                  }}>
+                    {children}
+                  </code>
                 ),
               }}
             >
@@ -247,27 +378,19 @@ export default function EventDetail() {
         {/* Sources */}
         {event.sources && (
           <div style={{
-            marginTop: '44px',
-            paddingTop: '20px',
-            borderTop: '1px solid var(--phase-muted)',
-            opacity: 0.6,
+            marginTop: '44px', paddingTop: '20px',
+            borderTop: '1px solid var(--phase-muted)', opacity: 0.6,
           }}>
             <p style={{
-              fontSize: '9px',
-              color: 'var(--phase-muted)',
-              letterSpacing: '0.14em',
-              textTransform: 'uppercase',
-              marginBottom: '8px',
-              fontFamily: '"Inter", sans-serif',
-              fontWeight: 500,
+              fontSize: '9px', color: 'var(--phase-muted)',
+              letterSpacing: '0.14em', textTransform: 'uppercase',
+              marginBottom: '8px', fontFamily: '"Inter", sans-serif', fontWeight: 500,
             }}>
               Sources
             </p>
             <p style={{
-              fontSize: '12px',
-              color: 'var(--phase-muted)',
-              lineHeight: 1.75,
-              whiteSpace: 'pre-line',
+              fontSize: '12px', color: 'var(--phase-muted)',
+              lineHeight: 1.75, whiteSpace: 'pre-line',
               fontFamily: '"Inter", sans-serif',
             }}>
               {event.sources}
@@ -275,32 +398,26 @@ export default function EventDetail() {
           </div>
         )}
 
-        {/* ── Prev / Next navigation ─────────────────────────────────────────── */}
+        {/* Prev / Next navigation */}
         <nav style={{
-          marginTop: '60px',
-          paddingTop: '24px',
+          marginTop: '60px', paddingTop: '24px',
           borderTop: '2px solid var(--phase-accent)',
-          display: 'flex',
-          justifyContent: 'space-between',
-          gap: '24px',
+          display: 'flex', justifyContent: 'space-between', gap: '24px',
         }}>
           {prevEvent ? (
-            <Link
-              to={`/event/${prevEvent.id}`}
-              style={{ textDecoration: 'none', flex: 1 }}
-            >
+            <Link to={`/event/${prevEvent.id}`} style={{ textDecoration: 'none', flex: 1 }}>
               <p style={{
                 fontSize: '9px', color: 'var(--phase-muted)', marginBottom: '6px',
                 letterSpacing: '0.12em', textTransform: 'uppercase',
                 fontFamily: '"Inter", sans-serif', fontWeight: 500,
               }}>← Previous</p>
-              <p style={{
-                fontSize: '13px', color: 'var(--phase-ink)',
-                lineHeight: 1.4, fontFamily: phase.fonts.body,
-                transition: 'color 0.15s',
-                overflow: 'hidden', display: '-webkit-box',
-                WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
-              }}
+              <p
+                style={{
+                  fontSize: '13px', color: 'var(--phase-ink)', lineHeight: 1.4,
+                  fontFamily: phase.fonts.body, transition: 'color 0.15s',
+                  overflow: 'hidden', display: '-webkit-box',
+                  WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
+                }}
                 onMouseEnter={e => e.currentTarget.style.color = 'var(--phase-accent)'}
                 onMouseLeave={e => e.currentTarget.style.color = 'var(--phase-ink)'}
               >
@@ -310,22 +427,19 @@ export default function EventDetail() {
           ) : <div />}
 
           {nextEvent ? (
-            <Link
-              to={`/event/${nextEvent.id}`}
-              style={{ textDecoration: 'none', flex: 1, textAlign: 'right' }}
-            >
+            <Link to={`/event/${nextEvent.id}`} style={{ textDecoration: 'none', flex: 1, textAlign: 'right' }}>
               <p style={{
                 fontSize: '9px', color: 'var(--phase-muted)', marginBottom: '6px',
                 letterSpacing: '0.12em', textTransform: 'uppercase',
                 fontFamily: '"Inter", sans-serif', fontWeight: 500,
               }}>Next →</p>
-              <p style={{
-                fontSize: '13px', color: 'var(--phase-ink)',
-                lineHeight: 1.4, fontFamily: phase.fonts.body,
-                transition: 'color 0.15s',
-                overflow: 'hidden', display: '-webkit-box',
-                WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
-              }}
+              <p
+                style={{
+                  fontSize: '13px', color: 'var(--phase-ink)', lineHeight: 1.4,
+                  fontFamily: phase.fonts.body, transition: 'color 0.15s',
+                  overflow: 'hidden', display: '-webkit-box',
+                  WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
+                }}
                 onMouseEnter={e => e.currentTarget.style.color = 'var(--phase-accent)'}
                 onMouseLeave={e => e.currentTarget.style.color = 'var(--phase-ink)'}
               >
