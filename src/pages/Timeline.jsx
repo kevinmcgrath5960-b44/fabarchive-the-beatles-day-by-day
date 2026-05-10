@@ -12,6 +12,14 @@ import { usePhase } from '@/lib/PhaseContext';
 const MONTH_NAMES = ['', 'January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December'];
 
+// Stat card definitions — label shown to user, type matched to event_type field
+const STAT_TYPE_MAP = [
+  { label: 'Recording Sessions', type: 'Recording Session' },
+  { label: 'Live Shows',         type: 'Live Performance' },
+  { label: 'Releases',           type: 'Release' },
+  { label: 'Media / TV',         type: 'Media Appearance' },
+];
+
 // ── Phase decoration (between month groups) ───────────────────────────────────
 function PhaseDecoration({ decoration, mmtPalette }) {
   if (decoration === 'asterisks') {
@@ -296,7 +304,6 @@ function YearBlog({ yearOverview, phase, year }) {
             em: ({ children }) => (
               <em style={{ fontStyle: 'italic', color: 'var(--phase-ink)' }}>{children}</em>
             ),
-            // Suppress any headings that snuck into the text
             h1: ({ children }) => <p style={{ fontWeight: 600, marginBottom: '1em' }}>{children}</p>,
             h2: ({ children }) => <p style={{ fontWeight: 600, marginBottom: '1em' }}>{children}</p>,
             h3: ({ children }) => <p style={{ fontWeight: 600, marginBottom: '1em' }}>{children}</p>,
@@ -306,7 +313,7 @@ function YearBlog({ yearOverview, phase, year }) {
         </ReactMarkdown>
       </div>
 
-      {/* Inline image placeholders — break up the text */}
+      {/* Inline image placeholders */}
       <div style={{
         display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px',
         marginBottom: '36px', border: '1px solid var(--phase-surface)',
@@ -333,7 +340,7 @@ function YearBlog({ yearOverview, phase, year }) {
         </div>
       )}
 
-      {/* Divider before day listing prompt */}
+      {/* Prompt to explore months */}
       <div style={{
         marginTop: '40px', paddingTop: '20px',
         borderTop: '1px solid var(--phase-surface)',
@@ -347,6 +354,53 @@ function YearBlog({ yearOverview, phase, year }) {
           Select a month from the sidebar to view events day by day
         </p>
       </div>
+    </div>
+  );
+}
+
+// ── Stat-filtered event list — shown when a stat card is active ───────────────
+function StatFilteredList({ events, phase, label, onClear }) {
+  return (
+    <div>
+      {/* Header row */}
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        marginBottom: '20px',
+      }}>
+        <p style={{
+          fontSize: '9px', fontFamily: '"Inter", sans-serif',
+          letterSpacing: '0.18em', textTransform: 'uppercase',
+          color: 'var(--phase-accent)', fontWeight: 600,
+        }}>
+          {label} · {events.length} event{events.length !== 1 ? 's' : ''}
+        </p>
+        <button
+          onClick={onClear}
+          style={{
+            fontSize: '10px', fontFamily: '"Inter", sans-serif',
+            color: 'var(--phase-muted)', background: 'none',
+            border: '1px solid var(--phase-muted)',
+            padding: '3px 10px', cursor: 'pointer',
+            letterSpacing: '0.06em', transition: 'color 0.15s, border-color 0.15s',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.color = 'var(--phase-ink)'; e.currentTarget.style.borderColor = 'var(--phase-ink)'; }}
+          onMouseLeave={e => { e.currentTarget.style.color = 'var(--phase-muted)'; e.currentTarget.style.borderColor = 'var(--phase-muted)'; }}
+        >
+          × Clear filter
+        </button>
+      </div>
+
+      {events.length === 0 ? (
+        <p style={{ fontSize: '13px', color: 'var(--phase-muted)', fontFamily: '"Inter", sans-serif', padding: '40px 0', textAlign: 'center' }}>
+          No {label.toLowerCase()} this year.
+        </p>
+      ) : (
+        <div>
+          {events.map(event => (
+            <EventRow key={event.id} event={event} phase={phase} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -402,16 +456,63 @@ function PhaseRibbon({ phase, yearEvents, filteredEvents, selectedMonth }) {
   );
 }
 
+// ── Stat strip — interactive cards ───────────────────────────────────────────
+function StatStrip({ stats, activeType, onStatClick }) {
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', marginBottom: '40px' }}>
+      {stats.map(({ label, type, count }, i) => {
+        const isActive = activeType === type;
+        return (
+          <button
+            key={label}
+            onClick={() => onStatClick(type)}
+            style={{
+              padding: '20px 16px',
+              textAlign: 'center',
+              border: '1px solid var(--phase-surface)',
+              borderLeft: i > 0 ? 'none' : '1px solid var(--phase-surface)',
+              background: isActive ? 'var(--phase-accent)' : 'transparent',
+              cursor: 'pointer',
+              transition: 'background 0.2s ease',
+              outline: 'none',
+            }}
+          >
+            <div style={{
+              fontFamily: 'var(--phase-font-display, serif)',
+              fontSize: '44px',
+              fontWeight: 700,
+              color: isActive ? 'var(--phase-bg)' : 'var(--phase-ink)',
+              lineHeight: 1,
+              marginBottom: '8px',
+              transition: 'color 0.2s ease',
+            }}>{count}</div>
+            <div style={{
+              fontSize: '9px',
+              fontFamily: '"Inter", sans-serif',
+              color: isActive ? 'var(--phase-bg)' : 'var(--phase-muted)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+              fontWeight: 500,
+              transition: 'color 0.2s ease',
+            }}>{label}</div>
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
 export default function Timeline() {
   const params = new URLSearchParams(window.location.search);
   const initYear   = params.get('year')   ? Number(params.get('year')) : 1962;
   const initMember = params.get('member') || null;
 
-  const [selectedYear,  setSelectedYear]  = useState(initYear);
-  const [selectedMonth, setSelectedMonth] = useState(null);
-  const [eventType,     setEventType]     = useState(null);
-  const [member,        setMember]        = useState(initMember);
+  const [selectedYear,    setSelectedYear]    = useState(initYear);
+  const [selectedMonth,   setSelectedMonth]   = useState(null);
+  const [eventType,       setEventType]       = useState(null);
+  const [member,          setMember]          = useState(initMember);
+  const [activeStatFilter, setActiveStatFilter] = useState(null);
 
   const { setPhaseId } = usePhase();
   const phase = getPhaseForYear(selectedYear);
@@ -431,9 +532,21 @@ export default function Timeline() {
     queryFn: () => base44.entities.YearOverview.list(),
   });
 
+  const { data: monthOverviews = [] } = useQuery({
+    queryKey: ['month-overviews'],
+    queryFn: () => base44.entities.MonthOverview.list(),
+  });
+
   const yearOverview = useMemo(() =>
     yearOverviews.find(o => o.year === selectedYear),
     [yearOverviews, selectedYear]
+  );
+
+  const monthOverview = useMemo(() =>
+    selectedMonth
+      ? monthOverviews.find(o => o.year === selectedYear && o.month === selectedMonth)
+      : null,
+    [monthOverviews, selectedYear, selectedMonth]
   );
 
   const yearEvents = useMemo(() =>
@@ -443,40 +556,75 @@ export default function Timeline() {
     [events, selectedYear]
   );
 
+  // All events in the selected month (unfiltered by type/member — used for stat counts)
+  const monthEvents = useMemo(() =>
+    selectedMonth
+      ? yearEvents.filter(e => new Date(e.date).getMonth() + 1 === selectedMonth)
+      : [],
+    [yearEvents, selectedMonth]
+  );
+
+  // Year-level stats
+  const typeStats = useMemo(() =>
+    STAT_TYPE_MAP.map(({ label, type }) => ({
+      label,
+      type,
+      count: yearEvents.filter(e => e.event_type === type).length,
+    })),
+    [yearEvents]
+  );
+
+  // Month-level stats (reflect selected month only)
+  const monthStats = useMemo(() =>
+    STAT_TYPE_MAP.map(({ label, type }) => ({
+      label,
+      type,
+      count: monthEvents.filter(e => e.event_type === type).length,
+    })),
+    [monthEvents]
+  );
+
+  // Events displayed in the list — respects all active filters
   const filteredEvents = useMemo(() => {
-    if (!selectedMonth) return yearEvents;
+    if (!selectedMonth) {
+      // Year view: only activeStatFilter applies here (shown in StatFilteredList)
+      return activeStatFilter
+        ? yearEvents.filter(e => e.event_type === activeStatFilter)
+        : yearEvents;
+    }
+    // Month view: month + optional type/member from FilterBar + optional stat card filter
     return yearEvents.filter(e => {
       if (new Date(e.date).getMonth() + 1 !== selectedMonth) return false;
       if (eventType && e.event_type !== eventType) return false;
       if (member && (!e.members || !e.members.includes(member))) return false;
+      if (activeStatFilter && e.event_type !== activeStatFilter) return false;
       return true;
     });
-  }, [yearEvents, selectedMonth, eventType, member]);
-
-  const typeStats = useMemo(() => [
-    { label: 'Recording Sessions', count: yearEvents.filter(e => e.event_type === 'Recording Session').length },
-    { label: 'Live Shows',         count: yearEvents.filter(e => e.event_type === 'Live Performance').length },
-    { label: 'Releases',           count: yearEvents.filter(e => e.event_type === 'Release').length },
-    { label: 'Media / TV',         count: yearEvents.filter(e => e.event_type === 'Media Appearance').length },
-  ], [yearEvents]);
+  }, [yearEvents, selectedMonth, eventType, member, activeStatFilter]);
 
   const leadEvent = useMemo(() =>
     yearEvents.find(e => e.photos?.length > 0) || yearEvents[0],
     [yearEvents]
   );
 
-  const eventsByMonth = useMemo(() => {
-    const map = new Map();
-    yearEvents.forEach(e => {
-      const m = new Date(e.date).getMonth() + 1;
-      if (!map.has(m)) map.set(m, []);
-      map.get(m).push(e);
-    });
-    return map;
-  }, [yearEvents]);
-
   const isYearView = !selectedMonth;
   const headlineSizePx = Math.min(phase.headlineSizePx, 68);
+
+  // Toggle a stat card — click again to deselect
+  const handleStatClick = (type) => {
+    setActiveStatFilter(prev => prev === type ? null : type);
+  };
+
+  // Derive month chapter heading from MonthOverview key_themes or fallback to month name
+  const monthChapterHeading = useMemo(() => {
+    if (!selectedMonth) return null;
+    if (monthOverview?.key_themes) {
+      // Use first theme as a punchy subheading, or the whole string if short
+      const themes = monthOverview.key_themes.split(',').map(t => t.trim()).filter(Boolean);
+      if (themes.length > 0 && themes[0].length < 80) return themes[0];
+    }
+    return `${MONTH_NAMES[selectedMonth]} ${selectedYear}`;
+  }, [selectedMonth, selectedYear, monthOverview]);
 
   return (
     <div
@@ -488,8 +636,19 @@ export default function Timeline() {
         <TimelineSidebar
           selectedYear={selectedYear}
           selectedMonth={selectedMonth}
-          onYearChange={y => { setSelectedYear(y); setSelectedMonth(null); setEventType(null); setMember(null); }}
-          onMonthChange={m => { setSelectedMonth(m); setEventType(null); setMember(null); }}
+          onYearChange={y => {
+            setSelectedYear(y);
+            setSelectedMonth(null);
+            setEventType(null);
+            setMember(null);
+            setActiveStatFilter(null);
+          }}
+          onMonthChange={m => {
+            setSelectedMonth(m);
+            setEventType(null);
+            setMember(null);
+            setActiveStatFilter(null);
+          }}
           member={member}
           onMemberChange={setMember}
         />
@@ -510,12 +669,10 @@ export default function Timeline() {
             <>
               <h1 style={{
                 fontFamily: phase.fonts.display,
-                fontSize: YEAR_CHAPTER_TITLES[selectedYear]
-                  ? `${Math.min(headlineSizePx, 48)}px`
-                  : `${headlineSizePx}px`,
+                fontSize: YEAR_CHAPTER_TITLES[selectedYear] ? '32px' : `${headlineSizePx}px`,
                 fontWeight: phase.weights.display,
                 color: 'var(--phase-ink)',
-                lineHeight: YEAR_CHAPTER_TITLES[selectedYear] ? 1.15 : phase.headlineLineHeight,
+                lineHeight: YEAR_CHAPTER_TITLES[selectedYear] ? 1.2 : phase.headlineLineHeight,
                 letterSpacing: phase.headlineTracking,
                 textTransform: phase.headlineCase,
                 marginBottom: '10px',
@@ -535,39 +692,14 @@ export default function Timeline() {
                 {YEAR_SUBTITLES[selectedYear]}
               </p>
 
-              {/* Stat strip */}
+              {/* Stat strip — interactive */}
               {!isLoading && (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', marginBottom: '40px' }}>
-                  {typeStats.map(({ label, count }, i) => (
-                    <div key={label} style={{
-                      padding: '20px 16px',
-                      textAlign: 'center',
-                      border: '1px solid var(--phase-surface)',
-                      borderLeft: i > 0 ? 'none' : '1px solid var(--phase-surface)',
-                    }}>
-                      <div style={{
-                        fontFamily: phase.fonts.display,
-                        fontSize: '44px',
-                        fontWeight: 700,
-                        color: 'var(--phase-ink)',
-                        lineHeight: 1,
-                        marginBottom: '8px',
-                      }}>{count}</div>
-                      <div style={{
-                        fontSize: '9px',
-                        fontFamily: '"Inter", sans-serif',
-                        color: 'var(--phase-muted)',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.1em',
-                        fontWeight: 500,
-                      }}>{label}</div>
-                    </div>
-                  ))}
-                </div>
+                <StatStrip
+                  stats={typeStats}
+                  activeType={activeStatFilter}
+                  onStatClick={handleStatClick}
+                />
               )}
-
-              {/* Lead entry */}
-              {!isLoading && leadEvent && <LeadEntry event={leadEvent} phase={phase} />}
 
               {isLoading && (
                 <div>
@@ -577,13 +709,28 @@ export default function Timeline() {
                 </div>
               )}
 
-              {/* Year blog — replaces the day-by-day list in year view */}
-              {!isLoading && (
-                <YearBlog
-                  yearOverview={yearOverview}
+              {/* Stat-filtered list OR normal year view */}
+              {!isLoading && activeStatFilter ? (
+                <StatFilteredList
+                  events={filteredEvents}
                   phase={phase}
-                  year={selectedYear}
+                  label={STAT_TYPE_MAP.find(s => s.type === activeStatFilter)?.label || activeStatFilter}
+                  onClear={() => setActiveStatFilter(null)}
                 />
+              ) : (
+                !isLoading && (
+                  <>
+                    {/* Lead entry */}
+                    {leadEvent && <LeadEntry event={leadEvent} phase={phase} />}
+
+                    {/* Year blog narrative */}
+                    <YearBlog
+                      yearOverview={yearOverview}
+                      phase={phase}
+                      year={selectedYear}
+                    />
+                  </>
+                )
               )}
             </>
           )}
@@ -591,7 +738,8 @@ export default function Timeline() {
           {/* ═══ MONTH VIEW ══════════════════════════════════════════════ */}
           {!isYearView && (
             <>
-              <div style={{ marginBottom: '28px' }}>
+              {/* Month heading — derived from MonthOverview key_themes */}
+              <div style={{ marginBottom: '20px' }}>
                 <h1 style={{
                   fontFamily: phase.fonts.display,
                   fontSize: '44px',
@@ -603,14 +751,68 @@ export default function Timeline() {
                   <span style={{ opacity: 0.45, fontWeight: 400 }}>{selectedYear} · </span>
                   {MONTH_NAMES[selectedMonth]}
                 </h1>
+                {monthChapterHeading && monthChapterHeading !== `${MONTH_NAMES[selectedMonth]} ${selectedYear}` && (
+                  <p style={{
+                    fontSize: '14px',
+                    fontStyle: 'italic',
+                    color: 'var(--phase-muted)',
+                    fontFamily: phase.fonts.body,
+                    lineHeight: 1.4,
+                    marginTop: '6px',
+                  }}>
+                    {monthChapterHeading}
+                  </p>
+                )}
               </div>
 
-              <FilterBar
-                eventType={eventType}
-                member={member}
-                onEventTypeChange={setEventType}
-                onMemberChange={setMember}
-              />
+              {/* Month stat strip — counts reflect selected month only */}
+              {!isLoading && (
+                <StatStrip
+                  stats={monthStats}
+                  activeType={activeStatFilter}
+                  onStatClick={handleStatClick}
+                />
+              )}
+
+              {/* FilterBar — hidden when stat card is active (stat card IS the filter) */}
+              {!activeStatFilter && (
+                <FilterBar
+                  eventType={eventType}
+                  member={member}
+                  onEventTypeChange={setEventType}
+                  onMemberChange={setMember}
+                />
+              )}
+
+              {/* Active stat filter indicator */}
+              {activeStatFilter && (
+                <div style={{
+                  display: 'flex', alignItems: 'center', gap: '10px',
+                  marginBottom: '20px',
+                }}>
+                  <span style={{
+                    fontSize: '9px', fontFamily: '"Inter", sans-serif',
+                    letterSpacing: '0.12em', textTransform: 'uppercase',
+                    color: 'var(--phase-accent)', fontWeight: 600,
+                  }}>
+                    Filtered: {STAT_TYPE_MAP.find(s => s.type === activeStatFilter)?.label}
+                  </span>
+                  <button
+                    onClick={() => setActiveStatFilter(null)}
+                    style={{
+                      fontSize: '10px', fontFamily: '"Inter", sans-serif',
+                      color: 'var(--phase-muted)', background: 'none',
+                      border: '1px solid var(--phase-muted)',
+                      padding: '2px 8px', cursor: 'pointer',
+                      transition: 'color 0.15s, border-color 0.15s',
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.color = 'var(--phase-ink)'; e.currentTarget.style.borderColor = 'var(--phase-ink)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.color = 'var(--phase-muted)'; e.currentTarget.style.borderColor = 'var(--phase-muted)'; }}
+                  >
+                    × Clear
+                  </button>
+                </div>
+              )}
 
               {isLoading ? (
                 <div>
@@ -621,7 +823,8 @@ export default function Timeline() {
               ) : filteredEvents.length === 0 ? (
                 <div style={{ padding: '60px 0', textAlign: 'center' }}>
                   <p style={{ fontSize: '13px', color: 'var(--phase-muted)', fontFamily: '"Inter", sans-serif' }}>
-                    No events found for {MONTH_NAMES[selectedMonth]} {selectedYear}.
+                    No events found for {MONTH_NAMES[selectedMonth]} {selectedYear}
+                    {activeStatFilter ? ` · ${STAT_TYPE_MAP.find(s => s.type === activeStatFilter)?.label}` : ''}.
                   </p>
                 </div>
               ) : (
