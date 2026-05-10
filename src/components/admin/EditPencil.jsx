@@ -2,13 +2,6 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/lib/AuthContext';
 
-// Small pencil icon shown only to admins.
-// Props:
-//   to         — admin route to navigate to
-//   returnTo   — path to come back to after saving (stored in router state)
-//   style      — optional extra styles on the wrapper
-//   title      — tooltip text
-
 export default function EditPencil({ to, returnTo, style, title = 'Edit' }) {
   const { user } = useAuth();
   if (user?.role !== 'admin') return null;
@@ -22,22 +15,35 @@ export default function EditPencil({ to, returnTo, style, title = 'Edit' }) {
       style={{
         display: 'inline-flex',
         alignItems: 'center',
-        justifyContent: 'center',
-        width: '20px',
-        height: '20px',
-        fontSize: '12px',
-        lineHeight: 1,
-        color: 'inherit',
-        opacity: 0.3,
+        gap: '4px',
+        padding: '3px 8px',
+        fontSize: '10px',
+        fontFamily: '"Inter", sans-serif',
+        fontWeight: 600,
+        letterSpacing: '0.06em',
+        textTransform: 'uppercase',
+        color: '#C8102E',
+        background: 'rgba(200, 16, 46, 0.08)',
+        border: '1px solid rgba(200, 16, 46, 0.3)',
         textDecoration: 'none',
         flexShrink: 0,
-        transition: 'opacity 0.15s',
+        transition: 'background 0.15s, border-color 0.15s, color 0.15s',
+        cursor: 'pointer',
+        whiteSpace: 'nowrap',
         ...style,
       }}
-      onMouseEnter={e => e.currentTarget.style.opacity = '1'}
-      onMouseLeave={e => e.currentTarget.style.opacity = '0.3'}
+      onMouseEnter={e => {
+        e.currentTarget.style.background = '#C8102E';
+        e.currentTarget.style.color = '#fff';
+        e.currentTarget.style.borderColor = '#C8102E';
+      }}
+      onMouseLeave={e => {
+        e.currentTarget.style.background = 'rgba(200, 16, 46, 0.08)';
+        e.currentTarget.style.color = '#C8102E';
+        e.currentTarget.style.borderColor = 'rgba(200, 16, 46, 0.3)';
+      }}
     >
-      ✏
+      ✏ Edit
     </Link>
   );
 }

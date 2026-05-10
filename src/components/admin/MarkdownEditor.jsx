@@ -171,52 +171,196 @@ export default function MarkdownEditor({ value, onChange, rows = 14, placeholder
           />
         </div>
 
-        {/* Preview */}
-        <div>
+        {/* Preview — WYSIWYG: matches EventDetail article column */}
+        <div style={{ background: '#F4ECDC', overflowY: 'auto' }}>
           <div style={{
-            padding: '4px 10px', fontSize: '10px', color: '#AAA',
-            background: '#FAFAFA', borderBottom: '1px solid #EEE',
+            padding: '4px 10px', fontSize: '10px', color: '#8A7E74',
+            background: '#EDE5D4', borderBottom: '1px solid #DDD5C4',
             letterSpacing: '0.06em', textTransform: 'uppercase',
           }}>
-            Preview
+            Preview — as it appears on site
           </div>
           <div style={{
-            padding: '12px 16px',
-            fontSize: '14px', lineHeight: 1.75,
-            color: '#222', fontFamily: 'Georgia, serif',
-            minHeight: `${rows * 1.7 * 13}px`,
-            overflowY: 'auto',
+            maxWidth: '680px',
+            margin: '0 auto',
+            padding: '36px 40px 52px',
+            minHeight: `${rows * 1.85 * 15}px`,
           }}>
             {value ? (
               <ReactMarkdown
                 components={{
-                  h2: ({ children }) => <h2 style={{ fontSize: '18px', fontWeight: 600, margin: '1.4em 0 0.4em', borderBottom: '1px solid #eee', paddingBottom: '0.3em' }}>{children}</h2>,
-                  h3: ({ children }) => <h3 style={{ fontSize: '15px', fontWeight: 600, margin: '1.2em 0 0.3em' }}>{children}</h3>,
-                  h4: ({ children }) => <h4 style={{ fontSize: '11px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#888', margin: '1em 0 0.3em' }}>{children}</h4>,
-                  p: ({ children }) => <p style={{ marginBottom: '1em' }}>{children}</p>,
-                  blockquote: ({ children }) => <blockquote style={{ borderLeft: '3px solid #C8102E', paddingLeft: '12px', color: '#666', fontStyle: 'italic', margin: '1em 0' }}>{children}</blockquote>,
-                  hr: () => <hr style={{ border: 'none', borderTop: '1px solid #DDD', margin: '1.5em 0' }} />,
-                  strong: ({ children }) => <strong style={{ fontWeight: 700 }}>{children}</strong>,
-                  em: ({ children }) => <em style={{ fontStyle: 'italic' }}>{children}</em>,
-                  ul: ({ children }) => <ul style={{ paddingLeft: '1.4em', marginBottom: '1em' }}>{children}</ul>,
-                  ol: ({ children }) => <ol style={{ paddingLeft: '1.4em', marginBottom: '1em' }}>{children}</ol>,
-                  li: ({ children }) => <li style={{ marginBottom: '0.3em' }}>{children}</li>,
+                  p: ({ children }) => (
+                    <p style={{
+                      marginBottom: '1.5em',
+                      fontSize: '15px',
+                      lineHeight: 1.85,
+                      color: '#1A1614',
+                      fontFamily: '"Cormorant Garamond", "Cormorant", Georgia, serif',
+                      fontWeight: 400,
+                    }}>
+                      {children}
+                    </p>
+                  ),
+
+                  h2: ({ children }) => (
+                    <h2 style={{
+                      fontFamily: '"Playfair Display", "Palatino Linotype", Georgia, serif',
+                      fontSize: '24px',
+                      fontWeight: 700,
+                      color: '#1A1614',
+                      lineHeight: 1.25,
+                      margin: '2.2em 0 0.7em',
+                      paddingBottom: '0.4em',
+                      borderBottom: '1px solid #DDD5C4',
+                    }}>
+                      {children}
+                    </h2>
+                  ),
+
+                  h3: ({ children }) => (
+                    <h3 style={{
+                      fontFamily: '"Playfair Display", "Palatino Linotype", Georgia, serif',
+                      fontSize: '18px',
+                      fontWeight: 700,
+                      color: '#1A1614',
+                      lineHeight: 1.3,
+                      margin: '1.8em 0 0.5em',
+                    }}>
+                      {children}
+                    </h3>
+                  ),
+
+                  h4: ({ children }) => (
+                    <h4 style={{
+                      fontFamily: '"Inter", sans-serif',
+                      fontSize: '11px',
+                      fontWeight: 700,
+                      color: '#6B6461',
+                      letterSpacing: '0.12em',
+                      textTransform: 'uppercase',
+                      margin: '1.6em 0 0.4em',
+                    }}>
+                      {children}
+                    </h4>
+                  ),
+
+                  blockquote: ({ children }) => (
+                    <blockquote style={{
+                      borderLeft: '3px solid #C8102E',
+                      margin: '1.8em 0',
+                      paddingLeft: '20px',
+                      color: '#6B6461',
+                      fontStyle: 'italic',
+                      fontFamily: '"Cormorant Garamond", Georgia, serif',
+                      fontSize: '15px',
+                      lineHeight: 1.85,
+                    }}>
+                      {children}
+                    </blockquote>
+                  ),
+
+                  hr: () => (
+                    <hr style={{
+                      border: 'none',
+                      borderTop: '1px solid #DDD5C4',
+                      margin: '2.5em 0',
+                    }} />
+                  ),
+
+                  ul: ({ children }) => (
+                    <ul style={{
+                      paddingLeft: '1.4em', marginBottom: '1.5em',
+                      color: '#1A1614',
+                      fontFamily: '"Cormorant Garamond", Georgia, serif',
+                      fontSize: '15px', lineHeight: 1.85,
+                    }}>
+                      {children}
+                    </ul>
+                  ),
+
+                  ol: ({ children }) => (
+                    <ol style={{
+                      paddingLeft: '1.4em', marginBottom: '1.5em',
+                      color: '#1A1614',
+                      fontFamily: '"Cormorant Garamond", Georgia, serif',
+                      fontSize: '15px', lineHeight: 1.85,
+                    }}>
+                      {children}
+                    </ol>
+                  ),
+
+                  li: ({ children }) => (
+                    <li style={{ marginBottom: '0.4em', lineHeight: 1.7 }}>{children}</li>
+                  ),
+
+                  strong: ({ children }) => (
+                    <strong style={{ color: '#1A1614', fontWeight: 600 }}>{children}</strong>
+                  ),
+
+                  em: ({ children }) => (
+                    <em style={{ color: '#1A1614', fontStyle: 'italic' }}>{children}</em>
+                  ),
+
+                  a: ({ href, children }) => (
+                    <a href={href} style={{
+                      color: '#C8102E', textDecoration: 'underline',
+                      textUnderlineOffset: '3px',
+                    }}>
+                      {children}
+                    </a>
+                  ),
+
+                  code: ({ children }) => (
+                    <code style={{
+                      fontFamily: '"JetBrains Mono", monospace',
+                      fontSize: '13px',
+                      background: '#EDE5D4',
+                      padding: '1px 6px',
+                      color: '#C8102E',
+                    }}>
+                      {children}
+                    </code>
+                  ),
+
                   img: ({ src, alt }) => {
-                    const [caption] = (alt || '').split('|');
+                    const parts = (alt || '').split('|').map(s => s.trim());
+                    const caption = parts[0];
+                    const sizeHint = (parts[1] || 'full').toLowerCase();
+                    const sizeMap = {
+                      full:  { width: '100%', margin: '2em 0', display: 'block' },
+                      half:  { width: '50%',  margin: '2em auto', display: 'block' },
+                      third: { width: '33.333%', margin: '2em auto', display: 'block' },
+                      right: { width: '40%', float: 'right', margin: '0.4em 0 1.2em 2em' },
+                      left:  { width: '40%', float: 'left',  margin: '0.4em 2em 1.2em 0' },
+                    };
+                    const wrapStyle = sizeMap[sizeHint] || sizeMap.full;
                     return (
-                      <figure style={{ margin: '1em 0' }}>
-                        <img src={src} alt={caption} style={{ maxWidth: '100%', display: 'block' }} />
-                        {caption && <figcaption style={{ fontSize: '11px', color: '#888', marginTop: '4px', fontStyle: 'italic' }}>{caption}</figcaption>}
+                      <figure style={{ margin: 0, ...wrapStyle }}>
+                        <img src={src} alt={caption} style={{ width: '100%', display: 'block' }} />
+                        {caption && (
+                          <figcaption style={{
+                            fontSize: '11px', color: '#6B6461',
+                            background: '#EDE5D4', padding: '8px 12px',
+                            fontFamily: '"Inter", sans-serif',
+                            lineHeight: 1.5, fontStyle: 'italic',
+                          }}>
+                            {caption}
+                          </figcaption>
+                        )}
                       </figure>
                     );
                   },
-                  a: ({ href, children }) => <a href={href} style={{ color: '#C8102E', textDecoration: 'underline' }}>{children}</a>,
                 }}
               >
                 {value}
               </ReactMarkdown>
             ) : (
-              <p style={{ color: '#CCC', fontStyle: 'italic', fontSize: '13px' }}>Preview will appear here…</p>
+              <p style={{
+                color: '#A09890', fontStyle: 'italic', fontSize: '14px',
+                fontFamily: '"Cormorant Garamond", Georgia, serif',
+              }}>
+                Preview will appear here…
+              </p>
             )}
           </div>
         </div>
