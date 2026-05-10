@@ -3,8 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '@/components/ui/use-toast';
-import MDEditor from '@uiw/react-md-editor';
-import '@uiw/react-md-editor/markdown-editor.css';
+import MarkdownEditor from '@/components/admin/MarkdownEditor';
 
 const EVENT_TYPES = ['Recording Session', 'Live Performance', 'Business/Management', 'Apple Corps', 'Solo Work', 'Personal', 'Release', 'Media Appearance', 'Travel'];
 const ALL_MEMBERS = ['John Lennon', 'Paul McCartney', 'George Harrison', 'Ringo Starr', 'Pete Best', 'Stuart Sutcliffe'];
@@ -89,7 +88,7 @@ export default function AdminEventForm() {
   };
 
   return (
-    <div data-color-mode="light">
+    <div>
       <button
         onClick={() => navigate('/admin')}
         style={{ fontSize: '12px', color: '#666666', background: 'none', border: 'none', cursor: 'pointer', marginBottom: '20px', padding: 0 }}
@@ -237,11 +236,11 @@ export default function AdminEventForm() {
                   — supports markdown · inline images: <code style={{ fontSize: '11px', background: '#f4f4f4', padding: '1px 5px' }}>![caption|right](url)</code>
                 </span>
               </label>
-              <MDEditor
+              <MarkdownEditor
                 value={form.body || ''}
-                onChange={val => setForm({ ...form, body: val || '' })}
-                height={620}
-                preview="live"
+                onChange={val => setForm({ ...form, body: val })}
+                rows={28}
+                placeholder="Full event description…"
               />
             </div>
           </div>

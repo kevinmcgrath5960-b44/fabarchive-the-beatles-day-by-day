@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useToast } from '@/components/ui/use-toast';
-import MDEditor from '@uiw/react-md-editor';
-import '@uiw/react-md-editor/markdown-editor.css';
+import MarkdownEditor from '@/components/admin/MarkdownEditor';
 
 const YEARS = Array.from({ length: 10 }, (_, i) => 1962 + i);
 const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June',
@@ -89,7 +88,7 @@ export default function AdminOverviews() {
     : `${MONTH_NAMES[selectedMonth - 1]} ${selectedYear}`;
 
   return (
-    <div data-color-mode="light">
+    <div>
 
       {/* ── Tab switcher ──────────────────────────────────────────────────────── */}
       <div style={{ display: 'flex', borderBottom: '1px solid #E5E5E5', marginBottom: '24px' }}>
@@ -183,11 +182,11 @@ export default function AdminOverviews() {
           <p style={{ fontSize: '13px', fontWeight: 500, color: '#111', marginBottom: '10px' }}>
             {currentLabel}
           </p>
-          <MDEditor
+          <MarkdownEditor
             value={text}
-            onChange={val => setText(val || '')}
-            height={680}
-            preview="live"
+            onChange={val => setText(val)}
+            rows={30}
+            placeholder={isYear ? `What defined ${selectedYear} for the Beatles…` : 'What happened this month…'}
           />
         </div>
       </div>
