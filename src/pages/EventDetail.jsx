@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Link } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import ReactMarkdown from 'react-markdown';
 import EventTypeBadge from '../components/shared/EventTypeBadge';
@@ -27,7 +27,8 @@ const IMAGE_SIZE_STYLES = {
 };
 
 export default function EventDetail() {
-  const eventId = window.location.pathname.split('/event/')[1];
+  const { id: eventId } = useParams();
+  const navigate = useNavigate();
   const { setPhaseId } = usePhase();
 
   const { data: event, isLoading } = useQuery({
@@ -131,20 +132,21 @@ export default function EventDetail() {
           display: 'flex', alignItems: 'center',
           justifyContent: 'space-between', gap: '20px', flexWrap: 'wrap',
         }}>
-          <Link
-            to="/timeline"
+          <button
+            onClick={() => navigate(-1)}
             style={{
               fontSize: '11px', color: 'var(--phase-header-ink)',
               textDecoration: 'none', letterSpacing: '0.08em',
               textTransform: 'uppercase', fontFamily: '"Inter", sans-serif',
               opacity: 0.65, display: 'inline-flex', alignItems: 'center', gap: '6px',
-              transition: 'opacity 0.15s',
+              transition: 'opacity 0.15s', background: 'none', border: 'none',
+              cursor: 'pointer', padding: 0,
             }}
             onMouseEnter={e => e.currentTarget.style.opacity = '1'}
             onMouseLeave={e => e.currentTarget.style.opacity = '0.65'}
           >
-            ← Timeline
-          </Link>
+            ← Back
+          </button>
           <span style={{
             fontSize: '10px', color: 'var(--phase-header-ink)',
             letterSpacing: '0.12em', textTransform: 'uppercase',
