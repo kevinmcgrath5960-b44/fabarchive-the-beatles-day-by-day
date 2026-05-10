@@ -8,6 +8,7 @@ import EventTypeBadge from '../components/shared/EventTypeBadge';
 import MemberBadge from '../components/shared/MemberBadge';
 import { getPhaseForYear } from '@/lib/phases';
 import { usePhase } from '@/lib/PhaseContext';
+import EditPencil from '@/components/admin/EditPencil';
 
 // ── Parse inline image alt text for size hints ────────────────────────────────
 // Syntax: ![My caption|half](url)  →  caption="My caption", size="half"
@@ -167,18 +168,26 @@ export default function EventDetail() {
       <div style={{ maxWidth: '720px', margin: '0 auto', padding: '52px 40px 88px' }}>
 
         {/* Title */}
-        <h1 style={{
-          fontFamily: phase.fonts.display,
-          fontSize: 'clamp(26px, 4vw, 46px)',
-          fontWeight: phase.weights.display,
-          color: 'var(--phase-ink)',
-          lineHeight: 1.15,
-          letterSpacing: phase.headlineTracking,
-          textTransform: phase.headlineCase,
-          marginBottom: '24px',
-        }}>
-          {event.title}
-        </h1>
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', marginBottom: '24px' }}>
+          <h1 style={{
+            fontFamily: phase.fonts.display,
+            fontSize: 'clamp(26px, 4vw, 46px)',
+            fontWeight: phase.weights.display,
+            color: 'var(--phase-ink)',
+            lineHeight: 1.15,
+            letterSpacing: phase.headlineTracking,
+            textTransform: phase.headlineCase,
+            flex: 1,
+          }}>
+            {event.title}
+          </h1>
+          <EditPencil
+            to={`/admin/events/${eventId}`}
+            returnTo={`/event/${eventId}`}
+            title="Edit this event"
+            style={{ marginTop: '8px' }}
+          />
+        </div>
 
         {/* Metadata chips */}
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '36px', alignItems: 'center' }}>

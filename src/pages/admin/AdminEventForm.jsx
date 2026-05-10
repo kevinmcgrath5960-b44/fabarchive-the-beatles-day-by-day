@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useToast } from '@/components/ui/use-toast';
 import MarkdownEditor from '@/components/admin/MarkdownEditor';
 
@@ -19,6 +19,8 @@ const checkboxLabel = { display: 'flex', alignItems: 'center', gap: '7px', fontS
 
 export default function AdminEventForm() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const returnTo = location.state?.returnTo || '/admin';
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const pathParts = window.location.pathname.split('/');
@@ -64,8 +66,9 @@ export default function AdminEventForm() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['events-all'] });
+      queryClient.invalidateQueries({ queryKey: ['event', eventId] });
       toast({ title: isNew ? 'Event created' : 'Event updated' });
-      navigate('/admin');
+      navigate(returnTo);
     },
   });
 
@@ -90,10 +93,10 @@ export default function AdminEventForm() {
   return (
     <div>
       <button
-        onClick={() => navigate('/admin')}
+        onClick={() => navigate(returnTo)}
         style={{ fontSize: '12px', color: '#666666', background: 'none', border: 'none', cursor: 'pointer', marginBottom: '20px', padding: 0 }}
       >
-        ← Back to Events
+        ← Back
       </button>
       <h1 style={{ fontSize: '22px', fontWeight: 600, color: '#111111', marginBottom: '28px' }}>
         {isNew ? 'New Event' : 'Edit Event'}

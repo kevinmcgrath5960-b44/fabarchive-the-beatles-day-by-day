@@ -8,6 +8,7 @@ import TimelineSidebar from '../components/timeline/TimelineSidebar';
 import FilterBar from '../components/timeline/FilterBar';
 import { getPhaseForYear, YEAR_IN_WORDS, YEAR_CHAPTER_TITLES, YEAR_SUBTITLES } from '@/lib/phases';
 import { usePhase } from '@/lib/PhaseContext';
+import EditPencil from '@/components/admin/EditPencil';
 
 const MONTH_NAMES = ['', 'January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December'];
@@ -135,6 +136,14 @@ function EventRow({ event, phase }) {
               lineHeight: 1.3,
             }}>{event.location}</div>
           )}
+          <div style={{ marginTop: '6px', display: 'flex', justifyContent: 'flex-end' }}>
+            <EditPencil
+              to={`/admin/events/${event.id}`}
+              returnTo={window.location.pathname + window.location.search}
+              title="Edit event"
+              style={{ opacity: hovered ? 0.45 : 0, transition: 'opacity 0.15s' }}
+            />
+          </div>
         </div>
       </article>
     </Link>
@@ -609,7 +618,8 @@ export default function Timeline() {
               {chapterTitle ? (
                 // Structured chapter title: year in muted grey + headline + subheading
                 <div style={{ marginBottom: '32px' }}>
-                  <h1 style={{
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                  <h1 style={{ flex: 1,
                     fontFamily: phase.fonts.display,
                     fontSize: '48px',
                     fontWeight: phase.weights.display,
@@ -625,6 +635,13 @@ export default function Timeline() {
                     {' – '}
                     {chapterTitle.headline}
                   </h1>
+                  <EditPencil
+                    to={`/admin/overviews?year=${selectedYear}&tab=year`}
+                    returnTo={`/timeline?year=${selectedYear}`}
+                    title="Edit year overview"
+                    style={{ marginTop: '10px' }}
+                  />
+                  </div>
                   <p style={{
                     fontSize: '17px',
                     fontStyle: 'italic',
@@ -639,7 +656,8 @@ export default function Timeline() {
               ) : (
                 // Plain year title + subtitle
                 <div style={{ marginBottom: '32px' }}>
-                  <h1 style={{
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+                  <h1 style={{ flex: 1,
                     fontFamily: phase.fonts.display,
                     fontSize: `${headlineSizePx}px`,
                     fontWeight: phase.weights.display,
@@ -651,6 +669,13 @@ export default function Timeline() {
                   }}>
                     {YEAR_IN_WORDS[selectedYear]}
                   </h1>
+                  <EditPencil
+                    to={`/admin/overviews?year=${selectedYear}&tab=year`}
+                    returnTo={`/timeline?year=${selectedYear}`}
+                    title="Edit year overview"
+                    style={{ marginTop: '10px' }}
+                  />
+                  </div>
                   <p style={{
                     fontSize: '15px',
                     fontStyle: 'italic',
@@ -703,7 +728,9 @@ export default function Timeline() {
           {!isYearView && (
             <>
               <div style={{ marginBottom: '20px' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
                 <h1 style={{
+                  flex: 1,
                   fontFamily: phase.fonts.display,
                   fontSize: '44px',
                   fontWeight: phase.weights.display,
@@ -714,6 +741,13 @@ export default function Timeline() {
                   <span style={{ opacity: 0.45, fontWeight: 400 }}>{selectedYear} · </span>
                   {MONTH_NAMES[selectedMonth]}
                 </h1>
+                <EditPencil
+                  to={`/admin/overviews?year=${selectedYear}&month=${selectedMonth}&tab=month`}
+                  returnTo={`/timeline?year=${selectedYear}&month=${selectedMonth}`}
+                  title="Edit month overview"
+                  style={{ marginTop: '10px' }}
+                />
+                </div>
                 {monthChapterHeading && (
                   <p style={{
                     fontSize: '14px', fontStyle: 'italic',

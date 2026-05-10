@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useToast } from '@/components/ui/use-toast';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import MarkdownEditor from '@/components/admin/MarkdownEditor';
 
 const YEARS = Array.from({ length: 10 }, (_, i) => 1962 + i);
@@ -23,10 +24,15 @@ const pillBtn = (active) => ({
 export default function AdminOverviews() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const returnTo = location.state?.returnTo || null;
 
-  const [tab, setTab] = useState('month');
-  const [selectedYear, setSelectedYear] = useState(1963);
-  const [selectedMonth, setSelectedMonth] = useState(1);
+  // Pre-select from URL params when arriving via edit pencil
+  const [tab, setTab] = useState(searchParams.get('tab') || 'month');
+  const [selectedYear, setSelectedYear] = useState(Number(searchParams.get('year')) || 1963);
+  const [selectedMonth, setSelectedMonth] = useState(Number(searchParams.get('month')) || 1);
   const [text, setText] = useState('');
   const [themes, setThemes] = useState('');
 
@@ -63,6 +69,7 @@ export default function AdminOverviews() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['month-overviews'] });
       toast({ title: 'Month overview saved' });
+      if (returnTo) setTimeout(() => navigate(returnTo), 800);
     },
   });
 
@@ -77,6 +84,7 @@ export default function AdminOverviews() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['year-overviews'] });
       toast({ title: 'Year overview saved' });
+      if (returnTo) setTimeout(() => navigate(returnTo), 800);
     },
   });
 
@@ -89,6 +97,14 @@ export default function AdminOverviews() {
 
   return (
     <div>
+      {returnTo && (
+        <button
+          onClick={() => navigate(returnTo)}
+          style={{ fontSize: '12px', color: '#666666', background: 'none', border: 'none', cursor: 'pointer', marginBottom: '20px', padding: 0, display: 'block' }}
+        >
+          ← Back
+        </button>
+      )}
 
       {/* ── Tab switcher ──────────────────────────────────────────────────────── */}
       <div style={{ display: 'flex', borderBottom: '1px solid #E5E5E5', marginBottom: '24px' }}>
