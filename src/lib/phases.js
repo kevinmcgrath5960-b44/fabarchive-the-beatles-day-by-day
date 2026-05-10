@@ -135,6 +135,12 @@ export const YEAR_IN_WORDS = {
   1971: 'Nineteen Seventy-One',
 };
 
+// Chapter-style headlines for fully-developed years.
+// Falls back to YEAR_IN_WORDS for years not yet in this map.
+export const YEAR_CHAPTER_TITLES = {
+  1963: '1963: Chart Success to Super Stardom — The Year Beatlemania Swept the Nation',
+};
+
 // Short evocative year subtitles shown below the big year title
 export const YEAR_SUBTITLES = {
   1962: 'Hamburg. The Cavern. Pete Best out, Ringo in. Love Me Do.',

@@ -6,7 +6,7 @@ import { format } from 'date-fns';
 import ReactMarkdown from 'react-markdown';
 import TimelineSidebar from '../components/timeline/TimelineSidebar';
 import FilterBar from '../components/timeline/FilterBar';
-import { getPhaseForYear, YEAR_IN_WORDS, YEAR_SUBTITLES } from '@/lib/phases';
+import { getPhaseForYear, YEAR_IN_WORDS, YEAR_CHAPTER_TITLES, YEAR_SUBTITLES } from '@/lib/phases';
 import { usePhase } from '@/lib/PhaseContext';
 
 const MONTH_NAMES = ['', 'January', 'February', 'March', 'April', 'May', 'June',
@@ -510,15 +510,18 @@ export default function Timeline() {
             <>
               <h1 style={{
                 fontFamily: phase.fonts.display,
-                fontSize: `${headlineSizePx}px`,
+                fontSize: YEAR_CHAPTER_TITLES[selectedYear]
+                  ? `${Math.min(headlineSizePx, 48)}px`
+                  : `${headlineSizePx}px`,
                 fontWeight: phase.weights.display,
                 color: 'var(--phase-ink)',
-                lineHeight: phase.headlineLineHeight,
+                lineHeight: YEAR_CHAPTER_TITLES[selectedYear] ? 1.15 : phase.headlineLineHeight,
                 letterSpacing: phase.headlineTracking,
                 textTransform: phase.headlineCase,
                 marginBottom: '10px',
+                maxWidth: '720px',
               }}>
-                {YEAR_IN_WORDS[selectedYear]}
+                {YEAR_CHAPTER_TITLES[selectedYear] || YEAR_IN_WORDS[selectedYear]}
               </h1>
 
               <p style={{
