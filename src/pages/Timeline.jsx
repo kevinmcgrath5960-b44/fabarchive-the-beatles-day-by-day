@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
+import ReactMarkdown from 'react-markdown';
 import TimelineSidebar from '../components/timeline/TimelineSidebar';
 import FilterBar from '../components/timeline/FilterBar';
 import { getPhaseForYear, YEAR_IN_WORDS, YEAR_SUBTITLES } from '@/lib/phases';
@@ -221,6 +222,135 @@ function LeadEntry({ event, phase }) {
   );
 }
 
+// ── Image placeholder ─────────────────────────────────────────────────────────
+function ImagePlaceholder({ aspect = '16/9', label = 'Photograph' }) {
+  return (
+    <div style={{
+      width: '100%',
+      aspectRatio: aspect,
+      background: 'var(--phase-surface)',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginBottom: '0',
+    }}>
+      <div style={{
+        width: '32px', height: '32px', borderRadius: '50%',
+        border: '1px solid var(--phase-muted)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        marginBottom: '8px',
+        opacity: 0.4,
+      }}>
+        <span style={{ fontSize: '14px', color: 'var(--phase-muted)' }}>◎</span>
+      </div>
+      <span style={{
+        fontSize: '9px', fontFamily: '"Inter", sans-serif',
+        letterSpacing: '0.12em', textTransform: 'uppercase',
+        color: 'var(--phase-muted)', opacity: 0.5,
+      }}>{label}</span>
+    </div>
+  );
+}
+
+// ── Year blog — full narrative view replacing the day list ────────────────────
+function YearBlog({ yearOverview, phase, year }) {
+  if (!yearOverview) return null;
+
+  const themes = yearOverview.key_themes
+    ? yearOverview.key_themes.split(',').map(t => t.trim()).filter(Boolean)
+    : [];
+
+  return (
+    <div>
+      {/* Section label */}
+      <p style={{
+        fontSize: '9px', fontFamily: '"Inter", sans-serif',
+        letterSpacing: '0.18em', textTransform: 'uppercase',
+        color: 'var(--phase-muted)', marginBottom: '20px', fontWeight: 500,
+      }}>The Year in Full</p>
+
+      {/* Hero image placeholder */}
+      <div style={{ marginBottom: '32px', border: '1px solid var(--phase-surface)' }}>
+        <ImagePlaceholder aspect="21/9" label="Year in photographs" />
+      </div>
+
+      {/* Narrative prose */}
+      <div style={{
+        fontSize: '15px',
+        lineHeight: 1.9,
+        color: 'var(--phase-ink)',
+        fontFamily: phase.fonts.body,
+        fontWeight: phase.weights.body,
+        maxWidth: '680px',
+        marginBottom: '36px',
+      }}>
+        <ReactMarkdown
+          components={{
+            p: ({ children }) => (
+              <p style={{ marginBottom: '1.4em' }}>{children}</p>
+            ),
+            strong: ({ children }) => (
+              <strong style={{ color: 'var(--phase-ink)', fontWeight: 600 }}>{children}</strong>
+            ),
+            em: ({ children }) => (
+              <em style={{ fontStyle: 'italic', color: 'var(--phase-ink)' }}>{children}</em>
+            ),
+            // Suppress any headings that snuck into the text
+            h1: ({ children }) => <p style={{ fontWeight: 600, marginBottom: '1em' }}>{children}</p>,
+            h2: ({ children }) => <p style={{ fontWeight: 600, marginBottom: '1em' }}>{children}</p>,
+            h3: ({ children }) => <p style={{ fontWeight: 600, marginBottom: '1em' }}>{children}</p>,
+          }}
+        >
+          {yearOverview.overview_text}
+        </ReactMarkdown>
+      </div>
+
+      {/* Inline image placeholders — break up the text */}
+      <div style={{
+        display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px',
+        marginBottom: '36px', border: '1px solid var(--phase-surface)',
+      }}>
+        <ImagePlaceholder aspect="4/3" label="Studio" />
+        <ImagePlaceholder aspect="4/3" label="Live" />
+      </div>
+
+      {/* Key themes chips */}
+      {themes.length > 0 && (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '16px' }}>
+          <span style={{
+            fontSize: '9px', fontFamily: '"Inter", sans-serif',
+            letterSpacing: '0.12em', textTransform: 'uppercase',
+            color: 'var(--phase-muted)', alignSelf: 'center', marginRight: '4px',
+          }}>Themes:</span>
+          {themes.map(t => (
+            <span key={t} style={{
+              fontSize: '10px', fontFamily: '"Inter", sans-serif',
+              color: 'var(--phase-accent)', border: '1px solid var(--phase-accent)',
+              padding: '3px 10px', letterSpacing: '0.06em',
+            }}>{t}</span>
+          ))}
+        </div>
+      )}
+
+      {/* Divider before day listing prompt */}
+      <div style={{
+        marginTop: '40px', paddingTop: '20px',
+        borderTop: '1px solid var(--phase-surface)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+      }}>
+        <p style={{
+          fontSize: '10px', fontFamily: '"Inter", sans-serif',
+          letterSpacing: '0.12em', textTransform: 'uppercase',
+          color: 'var(--phase-muted)', opacity: 0.6, textAlign: 'center',
+        }}>
+          Select a month from the sidebar to view events day by day
+        </p>
+      </div>
+    </div>
+  );
+}
+
 // ── Phase ribbon ──────────────────────────────────────────────────────────────
 function PhaseRibbon({ phase, yearEvents, filteredEvents, selectedMonth }) {
   const isYearView = !selectedMonth;
@@ -295,6 +425,16 @@ export default function Timeline() {
     queryKey: ['events-all'],
     queryFn: () => base44.entities.Event.list('date', 2000),
   });
+
+  const { data: yearOverviews = [] } = useQuery({
+    queryKey: ['year-overviews'],
+    queryFn: () => base44.entities.YearOverview.list(),
+  });
+
+  const yearOverview = useMemo(() =>
+    yearOverviews.find(o => o.year === selectedYear),
+    [yearOverviews, selectedYear]
+  );
 
   const yearEvents = useMemo(() =>
     events
@@ -428,57 +568,19 @@ export default function Timeline() {
 
               {isLoading && (
                 <div>
-                  {Array.from({ length: 8 }).map((_, i) => (
-                    <div key={i} style={{ height: '60px', background: 'var(--phase-surface)', marginBottom: '2px', opacity: 0.4 }} />
+                  {Array.from({ length: 6 }).map((_, i) => (
+                    <div key={i} style={{ height: '40px', background: 'var(--phase-surface)', marginBottom: '8px', opacity: 0.3 }} />
                   ))}
                 </div>
               )}
 
-              {/* The Year in Days */}
-              {!isLoading && yearEvents.length > 0 && (
-                <div>
-                  <p style={{
-                    fontSize: '9px',
-                    fontFamily: '"Inter", sans-serif',
-                    letterSpacing: '0.18em',
-                    textTransform: 'uppercase',
-                    color: 'var(--phase-muted)',
-                    marginBottom: '24px',
-                    fontWeight: 500,
-                  }}>The Year in Days</p>
-
-                  {Array.from(eventsByMonth.entries()).map(([month, monthEvents], idx, arr) => (
-                    <div key={month}>
-                      <h2 style={{
-                        fontSize: '10px',
-                        fontFamily: '"Inter", sans-serif',
-                        fontWeight: 700,
-                        letterSpacing: '0.18em',
-                        textTransform: 'uppercase',
-                        color: 'var(--phase-accent)',
-                        marginBottom: '0',
-                        paddingBottom: '8px',
-                        borderBottom: '2px solid var(--phase-accent)',
-                      }}>
-                        {MONTH_NAMES[month]}
-                      </h2>
-                      {monthEvents.map(event => (
-                        <EventRow key={event.id} event={event} phase={phase} />
-                      ))}
-                      {idx < arr.length - 1 && (
-                        <PhaseDecoration decoration={phase.decoration} mmtPalette={phase.mmtPalette} />
-                      )}
-                    </div>
-                  ))}
-                </div>
-              )}
-
-              {!isLoading && yearEvents.length === 0 && (
-                <div style={{ padding: '60px 0', textAlign: 'center' }}>
-                  <p style={{ fontSize: '13px', color: 'var(--phase-muted)', fontFamily: '"Inter", sans-serif' }}>
-                    No events found for {selectedYear}.
-                  </p>
-                </div>
+              {/* Year blog — replaces the day-by-day list in year view */}
+              {!isLoading && (
+                <YearBlog
+                  yearOverview={yearOverview}
+                  phase={phase}
+                  year={selectedYear}
+                />
               )}
             </>
           )}
