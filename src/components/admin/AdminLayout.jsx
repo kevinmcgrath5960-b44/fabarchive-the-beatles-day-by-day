@@ -5,7 +5,7 @@ import { Calendar, Image, FileText, Users, Settings } from 'lucide-react';
 const ADMIN_NAV = [
   { label: 'Events', path: '/admin', icon: Calendar },
   { label: 'Photos', path: '/admin/photos', icon: Image },
-  { label: 'Month Overviews', path: '/admin/overviews', icon: FileText },
+  { label: 'Overviews', path: '/admin/overviews', icon: FileText },
   { label: 'Members', path: '/admin/members', icon: Users },
   { label: 'Settings', path: '/admin/settings', icon: Settings },
 ];
@@ -71,7 +71,7 @@ export default function AdminLayout() {
           })}
         </div>
 
-        <div style={{ padding: '32px', maxWidth: '900px' }}>
+        <div style={{ padding: '32px' }}>
           <Outlet />
         </div>
       </div>

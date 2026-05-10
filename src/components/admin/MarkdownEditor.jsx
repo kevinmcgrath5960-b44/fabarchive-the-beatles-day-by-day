@@ -143,8 +143,8 @@ export default function MarkdownEditor({ value, onChange, rows = 14, placeholder
         </span>
       </div>
 
-      {/* ── Two-pane layout: editor left, preview right (fixed 700px) ──────── */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 700px' }}>
+      {/* ── Two-pane layout: editor left, preview right ───────────────────── */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
         {/* Editor */}
         <div style={{ borderRight: '1px solid #EEEEEE' }}>
           <div style={{

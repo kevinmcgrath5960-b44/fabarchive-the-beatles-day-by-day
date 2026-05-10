@@ -104,10 +104,10 @@ export default function AdminEventForm() {
 
       <form onSubmit={e => { e.preventDefault(); saveMutation.mutate(form); }}>
 
-        {/* ── Row 1: metadata left · title right ──────────────────────────── */}
-        <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: '40px', alignItems: 'flex-start', marginBottom: '32px' }}>
+        {/* ── Two-column layout: controls left · editor right ─────────────── */}
+        <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: '40px', alignItems: 'flex-start' }}>
 
-          {/* ── LEFT: Metadata ──────────────────────────────────────────────── */}
+          {/* ── LEFT: Metadata controls ─────────────────────────────────────── */}
           <div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '16px' }}>
@@ -124,7 +124,7 @@ export default function AdminEventForm() {
               </div>
             </div>
 
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', marginBottom: '16px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '16px' }}>
               <label style={checkboxLabel}>
                 <input type="checkbox" checked={form.approximate_date} onChange={e => setForm({ ...form, approximate_date: e.target.checked })} />
                 Approximate date
@@ -219,7 +219,7 @@ export default function AdminEventForm() {
             </button>
           </div>
 
-          {/* ── RIGHT: Title ────────────────────────────────────────────────── */}
+          {/* ── RIGHT: Title + full body editor ─────────────────────────────── */}
           <div>
             <div style={fieldStyle}>
               <label style={labelStyle}>Title</label>
@@ -231,23 +231,22 @@ export default function AdminEventForm() {
                 placeholder="Event headline"
               />
             </div>
-          </div>
-        </div>
 
-        {/* ── Row 2: Full-width Body editor ───────────────────────────────── */}
-        <div style={fieldStyle}>
-          <label style={labelStyle}>
-            Body
-            <span style={{ color: '#999', fontWeight: 400, marginLeft: '6px' }}>
-              — supports markdown · inline images: <code style={{ fontSize: '11px', background: '#f4f4f4', padding: '1px 5px' }}>![caption|right](url)</code>
-            </span>
-          </label>
-          <MarkdownEditor
-            value={form.body || ''}
-            onChange={val => setForm({ ...form, body: val })}
-            rows={30}
-            placeholder="Full event description…"
-          />
+            <div style={fieldStyle}>
+              <label style={labelStyle}>
+                Body
+                <span style={{ color: '#999', fontWeight: 400, marginLeft: '6px' }}>
+                  — markdown · inline images: <code style={{ fontSize: '11px', background: '#f4f4f4', padding: '1px 5px' }}>![caption|right](url)</code>
+                </span>
+              </label>
+              <MarkdownEditor
+                value={form.body || ''}
+                onChange={val => setForm({ ...form, body: val })}
+                rows={32}
+                placeholder="Full event description…"
+              />
+            </div>
+          </div>
         </div>
 
       </form>
