@@ -35,4 +35,153 @@
   }
   body {
     @apply bg-white text-[#111111];
- 
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   PHASE TOKEN SYSTEM
+   Each .phase-{id} scope defines CSS custom properties consumed by Timeline,
+   TimelineSidebar, FilterBar, and EventDetail components.
+   ───────────────────────────────────────────────────────────────────────────── */
+
+/* ── ARCHIVE · 1962–63 ─────────────────────────────────────────────────── */
+.phase-archive {
+  --phase-bg:         #F4ECDC;
+  --phase-ink:        #1A1614;
+  --phase-muted:      #6B5E4F;
+  --phase-surface:    #EFE6D2;
+  --phase-accent:     #A8231C;
+  --phase-header-bg:  #1A1614;
+  --phase-header-ink: #F4ECDC;
+  --phase-sb-bg:      #EFE6D2;
+  --phase-sb-ink:     #1A1614;
+  --phase-sb-muted:   #8a7e6f;
+  --phase-sb-accent:  #A8231C;
+}
+
+/* ── TRANSITIONAL · 1964–65 ────────────────────────────────────────────── */
+.phase-transitional {
+  --phase-bg:         #3C2A1F;
+  --phase-ink:        #EFE2C8;
+  --phase-muted:      #a89870;
+  --phase-surface:    #4a3527;
+  --phase-accent:     #C46A3A;
+  --phase-header-bg:  #2A1D14;
+  --phase-header-ink: #EFE2C8;
+  --phase-sb-bg:      #2A1D14;
+  --phase-sb-ink:     #EFE2C8;
+  --phase-sb-muted:   #7a6a55;
+  --phase-sb-accent:  #C46A3A;
+}
+
+/* ── MOPTOP / MATURE SHIFT · 1966 ──────────────────────────────────────── */
+.phase-moptop {
+  --phase-bg:         #0E0E0E;
+  --phase-ink:        #F5F5F0;
+  --phase-muted:      #8a8a85;
+  --phase-surface:    #1a1a1a;
+  --phase-accent:     #C8102E;
+  --phase-header-bg:  #0E0E0E;
+  --phase-header-ink: #F5F5F0;
+  --phase-sb-bg:      #141414;
+  --phase-sb-ink:     #F5F5F0;
+  --phase-sb-muted:   #6a6a65;
+  --phase-sb-accent:  #C8102E;
+}
+
+/* ── PSYCHEDELIC · 1967 ─────────────────────────────────────────────────── */
+.phase-psychedelic {
+  --phase-bg:         #ED1C24;
+  --phase-ink:        #FFF7E1;
+  --phase-muted:      #FFD7A0;
+  --phase-surface:    #FCC419;
+  --phase-accent:     #46BDE0;
+  --phase-header-bg:  #1F0A1F;
+  --phase-header-ink: #FCC419;
+  --phase-sb-bg:      #FCC419;
+  --phase-sb-ink:     #0c1a2e;
+  --phase-sb-muted:   #6e5a18;
+  --phase-sb-accent:  #ED1C24;
+}
+
+/* ── BOHEMIAN · 1968–71 ─────────────────────────────────────────────────── */
+.phase-bohemian {
+  --phase-bg:         #F1ECE3;
+  --phase-ink:        #1a1814;
+  --phase-muted:      #7c7468;
+  --phase-surface:    #E5DED0;
+  --phase-accent:     #3E5C3A;
+  --phase-header-bg:  #1a1814;
+  --phase-header-ink: #F1ECE3;
+  --phase-sb-bg:      #FFFFFF;
+  --phase-sb-ink:     #1a1814;
+  --phase-sb-muted:   #9a9285;
+  --phase-sb-accent:  #3E5C3A;
+}
+
+/* ── DETAIL VARIANTS — softer palette for long-form reading ──────────────── */
+/* Archive detail: same palette, already comfortable for reading */
+.phase-archive.phase-detail {
+  --phase-bg:      #F4ECDC;
+  --phase-ink:     #1A1614;
+  --phase-muted:   #6B5E4F;
+  --phase-accent:  #A8231C;
+}
+
+/* Transitional detail: lift to cream paper */
+.phase-transitional.phase-detail {
+  --phase-bg:         #F1E6CF;
+  --phase-ink:        #2A1D14;
+  --phase-muted:      #7A5E3F;
+  --phase-surface:    #E5D6B5;
+  --phase-accent:     #9C3A1F;
+  --phase-header-bg:  #3C2A1F;
+  --phase-header-ink: #F1E6CF;
+}
+
+/* Moptop detail: warm off-white instead of pure black */
+.phase-moptop.phase-detail {
+  --phase-bg:         #F5F5F0;
+  --phase-ink:        #0E0E0E;
+  --phase-muted:      #6a6a65;
+  --phase-surface:    #EAEAE3;
+  --phase-accent:     #C8102E;
+  --phase-header-bg:  #0E0E0E;
+  --phase-header-ink: #F5F5F0;
+}
+
+/* Psychedelic detail: cream paper, red accent, yellow chips */
+.phase-psychedelic.phase-detail {
+  --phase-bg:         #FFF6E0;
+  --phase-ink:        #1a0a08;
+  --phase-muted:      #7a4a1a;
+  --phase-surface:    #FCC419;
+  --phase-accent:     #ED1C24;
+  --phase-header-bg:  #ED1C24;
+  --phase-header-ink: #FCC419;
+}
+
+/* Bohemian detail: very close to default, slightly warmer */
+.phase-bohemian.phase-detail {
+  --phase-bg:         #F8F4EC;
+  --phase-ink:        #1a1814;
+  --phase-muted:      #7c7468;
+  --phase-surface:    #EDE7DA;
+  --phase-accent:     #3E5C3A;
+  --phase-header-bg:  #1a1814;
+  --phase-header-ink: #F8F4EC;
+}
+
+/* ── Drop cap for event detail body ─────────────────────────────────────── */
+.phase-drop-cap::first-letter {
+  float: left;
+  font-size: 5.4em;
+  line-height: 0.78;
+  padding: 10px 12px 0 0;
+  color: var(--phase-accent);
+  font-weight: 600;
+}

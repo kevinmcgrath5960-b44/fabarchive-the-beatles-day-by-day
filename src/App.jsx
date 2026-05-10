@@ -72,4 +72,11 @@ function App() {
           <PhaseProvider>
             <AuthenticatedApp />
           </PhaseProvider>
-        <
+        </Router>
+        <Toaster />
+      </QueryClientProvider>
+    </AuthProvider>
+  )
+}
+
+export default App

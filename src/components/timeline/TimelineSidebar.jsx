@@ -88,3 +88,106 @@ export default function TimelineSidebar({ selectedYear, selectedMonth, onYearCha
               <button
                 key={year}
                 onClick={() => onYearChange(year)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '9px',
+                  width: '100%',
+                  padding: '5px 18px',
+                  fontSize: '13px',
+                  fontFamily: '"Inter", sans-serif',
+                  fontWeight: isActive ? 600 : 400,
+                  color: isActive ? 'var(--phase-sb-ink)' : 'var(--phase-sb-muted)',
+                  background: 'none',
+                  border: 'none',
+                  borderLeft: `2px solid ${isActive ? 'var(--phase-sb-accent)' : 'transparent'}`,
+                  cursor: 'pointer',
+                  transition: 'color 0.15s, border-color 0.15s',
+                  textAlign: 'left',
+                }}
+                onMouseEnter={e => { if (!isActive) e.currentTarget.style.color = 'var(--phase-sb-ink)'; }}
+                onMouseLeave={e => { if (!isActive) e.currentTarget.style.color = 'var(--phase-sb-muted)'; }}
+              >
+                <span style={{
+                  width: '5px',
+                  height: '5px',
+                  borderRadius: '50%',
+                  background: dotColor,
+                  flexShrink: 0,
+                  opacity: isActive ? 1 : 0.45,
+                  transition: 'opacity 0.15s',
+                }} />
+                {year}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* ── Month chips ───────────────────────────────────────────────── */}
+        <div style={{ padding: '16px 18px 28px' }}>
+          <p style={{
+            fontSize: '9px',
+            color: 'var(--phase-sb-muted)',
+            letterSpacing: '0.12em',
+            textTransform: 'uppercase',
+            marginBottom: '10px',
+            fontFamily: '"Inter", sans-serif',
+            fontWeight: 500,
+          }}>Month</p>
+
+          {/* All months */}
+          <button
+            onClick={() => onMonthChange(null)}
+            style={{
+              display: 'block',
+              width: '100%',
+              textAlign: 'left',
+              padding: '5px 10px',
+              marginBottom: '8px',
+              fontSize: '11px',
+              fontFamily: '"Inter", sans-serif',
+              letterSpacing: '0.04em',
+              background: selectedMonth === null ? 'var(--phase-sb-accent)' : 'transparent',
+              color: selectedMonth === null ? 'var(--phase-sb-bg)' : 'var(--phase-sb-muted)',
+              border: `1px solid ${selectedMonth === null ? 'var(--phase-sb-accent)' : 'var(--phase-sb-muted)'}`,
+              cursor: 'pointer',
+              transition: 'background 0.15s, color 0.15s',
+            }}
+          >
+            All months
+          </button>
+
+          {/* Month grid 3×4 */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '4px' }}>
+            {MONTHS.map((month, idx) => {
+              const isActive = selectedMonth === idx + 1;
+              return (
+                <button
+                  key={idx}
+                  onClick={() => onMonthChange(idx + 1)}
+                  style={{
+                    padding: '5px 2px',
+                    fontSize: '10px',
+                    fontFamily: '"Inter", sans-serif',
+                    letterSpacing: '0.03em',
+                    textAlign: 'center',
+                    background: isActive ? 'var(--phase-sb-accent)' : 'transparent',
+                    color: isActive ? 'var(--phase-sb-bg)' : 'var(--phase-sb-muted)',
+                    border: `1px solid ${isActive ? 'var(--phase-sb-accent)' : 'var(--phase-sb-muted)'}`,
+                    cursor: 'pointer',
+                    transition: 'background 0.15s, color 0.15s',
+                  }}
+                  onMouseEnter={e => { if (!isActive) { e.currentTarget.style.color = 'var(--phase-sb-ink)'; e.currentTarget.style.borderColor = 'var(--phase-sb-ink)'; }}}
+                  onMouseLeave={e => { if (!isActive) { e.currentTarget.style.color = 'var(--phase-sb-muted)'; e.currentTarget.style.borderColor = 'var(--phase-sb-muted)'; }}}
+                >
+                  {month}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+      </div>
+    </aside>
+  );
+}

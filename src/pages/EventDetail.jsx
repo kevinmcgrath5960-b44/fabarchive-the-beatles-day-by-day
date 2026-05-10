@@ -177,4 +177,164 @@ export default function EventDetail() {
 
         {/* Photos */}
         {event.photos && event.photos.length > 0 && (
-          <div style={{ marginBottom: '40px', disp
+          <div style={{ marginBottom: '40px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {event.photos.map((photo, i) => (
+              <figure key={i} style={{ margin: 0 }}>
+                <img
+                  src={photo.url}
+                  alt={photo.caption || event.title}
+                  style={{ width: '100%', display: 'block' }}
+                />
+                {(photo.caption || photo.credit) && (
+                  <figcaption style={{
+                    padding: '10px 14px',
+                    fontSize: '11px',
+                    color: 'var(--phase-muted)',
+                    background: 'var(--phase-surface)',
+                    fontFamily: '"Inter", sans-serif',
+                    lineHeight: 1.5,
+                  }}>
+                    {photo.caption}
+                    {photo.credit && <em style={{ opacity: 0.8 }}> — {photo.credit}</em>}
+                  </figcaption>
+                )}
+              </figure>
+            ))}
+          </div>
+        )}
+
+        {/* Body text — first paragraph gets drop cap via .phase-drop-cap */}
+        {event.body && (
+          <div
+            className="phase-drop-cap"
+            style={{
+              fontSize: '15px',
+              color: 'var(--phase-ink)',
+              lineHeight: 1.85,
+              fontFamily: phase.fonts.body,
+              fontWeight: phase.weights.body,
+            }}
+          >
+            <ReactMarkdown
+              components={{
+                p: ({ children }) => (
+                  <p style={{ marginBottom: '1.5em' }}>{children}</p>
+                ),
+                blockquote: ({ children }) => (
+                  <blockquote style={{
+                    borderLeft: '3px solid var(--phase-accent)',
+                    margin: '1.8em 0',
+                    paddingLeft: '20px',
+                    color: 'var(--phase-muted)',
+                    fontStyle: 'italic',
+                  }}>
+                    {children}
+                  </blockquote>
+                ),
+                strong: ({ children }) => (
+                  <strong style={{ color: 'var(--phase-ink)', fontWeight: 600 }}>{children}</strong>
+                ),
+                em: ({ children }) => (
+                  <em style={{ color: 'var(--phase-ink)', fontStyle: 'italic' }}>{children}</em>
+                ),
+              }}
+            >
+              {event.body}
+            </ReactMarkdown>
+          </div>
+        )}
+
+        {/* Sources */}
+        {event.sources && (
+          <div style={{
+            marginTop: '44px',
+            paddingTop: '20px',
+            borderTop: '1px solid var(--phase-muted)',
+            opacity: 0.6,
+          }}>
+            <p style={{
+              fontSize: '9px',
+              color: 'var(--phase-muted)',
+              letterSpacing: '0.14em',
+              textTransform: 'uppercase',
+              marginBottom: '8px',
+              fontFamily: '"Inter", sans-serif',
+              fontWeight: 500,
+            }}>
+              Sources
+            </p>
+            <p style={{
+              fontSize: '12px',
+              color: 'var(--phase-muted)',
+              lineHeight: 1.75,
+              whiteSpace: 'pre-line',
+              fontFamily: '"Inter", sans-serif',
+            }}>
+              {event.sources}
+            </p>
+          </div>
+        )}
+
+        {/* ── Prev / Next navigation ─────────────────────────────────────────── */}
+        <nav style={{
+          marginTop: '60px',
+          paddingTop: '24px',
+          borderTop: '2px solid var(--phase-accent)',
+          display: 'flex',
+          justifyContent: 'space-between',
+          gap: '24px',
+        }}>
+          {prevEvent ? (
+            <Link
+              to={`/event/${prevEvent.id}`}
+              style={{ textDecoration: 'none', flex: 1 }}
+            >
+              <p style={{
+                fontSize: '9px', color: 'var(--phase-muted)', marginBottom: '6px',
+                letterSpacing: '0.12em', textTransform: 'uppercase',
+                fontFamily: '"Inter", sans-serif', fontWeight: 500,
+              }}>← Previous</p>
+              <p style={{
+                fontSize: '13px', color: 'var(--phase-ink)',
+                lineHeight: 1.4, fontFamily: phase.fonts.body,
+                transition: 'color 0.15s',
+                overflow: 'hidden', display: '-webkit-box',
+                WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
+              }}
+                onMouseEnter={e => e.currentTarget.style.color = 'var(--phase-accent)'}
+                onMouseLeave={e => e.currentTarget.style.color = 'var(--phase-ink)'}
+              >
+                {prevEvent.title}
+              </p>
+            </Link>
+          ) : <div />}
+
+          {nextEvent ? (
+            <Link
+              to={`/event/${nextEvent.id}`}
+              style={{ textDecoration: 'none', flex: 1, textAlign: 'right' }}
+            >
+              <p style={{
+                fontSize: '9px', color: 'var(--phase-muted)', marginBottom: '6px',
+                letterSpacing: '0.12em', textTransform: 'uppercase',
+                fontFamily: '"Inter", sans-serif', fontWeight: 500,
+              }}>Next →</p>
+              <p style={{
+                fontSize: '13px', color: 'var(--phase-ink)',
+                lineHeight: 1.4, fontFamily: phase.fonts.body,
+                transition: 'color 0.15s',
+                overflow: 'hidden', display: '-webkit-box',
+                WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
+              }}
+                onMouseEnter={e => e.currentTarget.style.color = 'var(--phase-accent)'}
+                onMouseLeave={e => e.currentTarget.style.color = 'var(--phase-ink)'}
+              >
+                {nextEvent.title}
+              </p>
+            </Link>
+          ) : <div />}
+        </nav>
+      </div>
+    </div>
+  );
+}

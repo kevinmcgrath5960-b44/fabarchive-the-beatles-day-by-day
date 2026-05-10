@@ -60,4 +60,23 @@ export default function FilterBar({ eventType, member, onEventTypeChange, onMemb
       {hasFilters && (
         <button
           onClick={() => { onEventTypeChange(null); onMemberChange(null); }}
-       
+          style={{
+            fontSize: '11px',
+            color: 'var(--phase-muted)',
+            background: 'none',
+            border: '1px solid var(--phase-muted)',
+            padding: '4px 10px',
+            cursor: 'pointer',
+            height: '28px',
+            fontFamily: '"Inter", sans-serif',
+            transition: 'color 0.15s, border-color 0.15s',
+          }}
+          onMouseEnter={e => { e.currentTarget.style.color = 'var(--phase-ink)'; e.currentTarget.style.borderColor = 'var(--phase-ink)'; }}
+          onMouseLeave={e => { e.currentTarget.style.color = 'var(--phase-muted)'; e.currentTarget.style.borderColor = 'var(--phase-muted)'; }}
+        >
+          × Clear
+        </button>
+      )}
+    </div>
+  );
+}
