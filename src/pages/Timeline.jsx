@@ -141,117 +141,72 @@ function EventRow({ event, phase }) {
   );
 }
 
-// ── Year highlights — random selection of up to 5 notable events ──────────────
-function YearHighlights({ highlights, phase }) {
-  if (!highlights.length) return null;
+// ── Lead entry — single featured event, randomly picked from milestones ──────
+function LeadEntry({ event, phase }) {
+  if (!event) return null;
+  const d = event.date ? new Date(event.date) : null;
+  const dateLabel = d ? format(d, 'd MMMM').toUpperCase() : '';
+  const hasPhoto = event.photos?.length > 0;
 
   return (
-    <div style={{ marginBottom: '52px' }}>
+    <div style={{ marginBottom: '48px' }}>
       <p style={{
         fontSize: '9px', fontFamily: '"Inter", sans-serif',
-        letterSpacing: '0.18em', textTransform: 'uppercase',
-        color: 'var(--phase-muted)', marginBottom: '4px', fontWeight: 500,
+        letterSpacing: '0.14em', textTransform: 'uppercase',
+        color: 'var(--phase-muted)', marginBottom: '14px', fontWeight: 500,
       }}>
-        Year Highlights
+        ★ Milestone · {dateLabel}
       </p>
-      <p style={{
-        fontSize: '10px', fontFamily: '"Inter", sans-serif',
-        color: 'var(--phase-muted)', marginBottom: '20px', opacity: 0.55,
-        letterSpacing: '0.04em',
-      }}>
-        A selection of notable moments — refreshes each visit
-      </p>
-
-      {highlights.map((event, i) => {
-        const d = event.date ? new Date(event.date) : null;
-        const dateLabel = d ? format(d, 'd MMMM').toUpperCase() : '';
-        const hasPhoto = event.photos?.length > 0;
-
-        return (
-          <Link key={event.id} to={`/event/${event.id}`} style={{ textDecoration: 'none', display: 'block' }}>
-            <div
-              style={{
-                display: 'grid',
-                gridTemplateColumns: hasPhoto ? '120px 1fr' : '36px 1fr',
-                gap: '20px',
-                alignItems: 'flex-start',
-                padding: '18px 0',
-                borderTop: i === 0 ? '2px solid var(--phase-accent)' : '1px solid var(--phase-surface)',
-                transition: 'opacity 0.15s',
-              }}
-              onMouseEnter={e => e.currentTarget.style.opacity = '0.75'}
-              onMouseLeave={e => e.currentTarget.style.opacity = '1'}
-            >
-              {/* Photo thumbnail or index number */}
-              {hasPhoto ? (
-                <div style={{ position: 'relative' }}>
-                  <img
-                    src={event.photos[0].url}
-                    alt={event.title}
-                    style={{ width: '120px', height: '80px', objectFit: 'cover', display: 'block' }}
-                  />
-                  <div style={{
-                    position: 'absolute', top: '6px', left: '6px',
-                    background: 'var(--phase-accent)', color: 'var(--phase-bg)',
-                    fontFamily: '"Inter", sans-serif', fontSize: '9px',
-                    fontWeight: 700, padding: '2px 6px', letterSpacing: '0.06em',
-                  }}>
-                    {String(i + 1).padStart(2, '0')}
-                  </div>
-                </div>
-              ) : (
-                <div style={{
-                  fontFamily: phase.fonts.display,
-                  fontSize: '32px',
-                  fontWeight: 700,
-                  color: 'var(--phase-muted)',
-                  opacity: 0.3,
-                  lineHeight: 1,
-                  paddingTop: '2px',
-                }}>
-                  {String(i + 1).padStart(2, '0')}
-                </div>
+      <Link to={`/event/${event.id}`} style={{ textDecoration: 'none', display: 'block' }}>
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: hasPhoto ? '1fr 1fr' : '1fr',
+          border: '1px solid var(--phase-surface)',
+        }}>
+          {hasPhoto && (
+            <div>
+              <img
+                src={event.photos[0].url}
+                alt={event.title}
+                style={{ width: '100%', height: '260px', objectFit: 'cover', display: 'block' }}
+              />
+              {event.photos[0].caption && (
+                <p style={{
+                  fontSize: '9px', fontFamily: '"Inter", sans-serif',
+                  color: 'var(--phase-muted)', letterSpacing: '0.1em',
+                  textTransform: 'uppercase', padding: '8px 12px',
+                  background: 'var(--phase-surface)',
+                }}>Photographed · {event.photos[0].caption}</p>
               )}
-
-              {/* Content */}
-              <div>
-                <div style={{
-                  fontSize: '9px',
-                  fontFamily: '"Inter", sans-serif',
-                  color: 'var(--phase-accent)',
-                  letterSpacing: '0.1em',
-                  textTransform: 'uppercase',
-                  fontWeight: 600,
-                  marginBottom: '5px',
-                }}>
-                  {dateLabel}
-                  {event.event_type && <span style={{ color: 'var(--phase-muted)', fontWeight: 400, marginLeft: '8px' }}>· {event.event_type}</span>}
-                </div>
-                <h3 style={{
-                  fontSize: '16px',
-                  fontFamily: phase.fonts.body,
-                  fontWeight: 500,
-                  color: 'var(--phase-ink)',
-                  lineHeight: 1.3,
-                  marginBottom: event.body ? '6px' : 0,
-                }}>{event.title}</h3>
-                {event.body && (
-                  <p style={{
-                    fontSize: '12px',
-                    fontFamily: '"Inter", sans-serif',
-                    color: 'var(--phase-muted)',
-                    lineHeight: 1.6,
-                    overflow: 'hidden',
-                    display: '-webkit-box',
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: 'vertical',
-                  }}>{event.body.substring(0, 180)}</p>
-                )}
-              </div>
             </div>
-          </Link>
-        );
-      })}
+          )}
+          <div style={{ padding: '28px' }}>
+            <h2 style={{
+              fontFamily: phase.fonts.display,
+              fontSize: '26px',
+              fontWeight: phase.weights.display,
+              color: 'var(--phase-ink)',
+              lineHeight: 1.2,
+              marginBottom: '14px',
+            }}>{event.title}</h2>
+            {event.body && (
+              <p style={{
+                fontSize: '13px', fontFamily: '"Inter", sans-serif',
+                color: 'var(--phase-muted)', lineHeight: 1.7,
+                marginBottom: '22px', overflow: 'hidden',
+                display: '-webkit-box', WebkitLineClamp: 4,
+                WebkitBoxOrient: 'vertical',
+              }}>{event.body.substring(0, 320)}</p>
+            )}
+            <div style={{
+              display: 'inline-block', padding: '9px 18px',
+              background: 'var(--phase-ink)', color: 'var(--phase-bg)',
+              fontSize: '10px', fontFamily: '"Inter", sans-serif',
+              letterSpacing: '0.12em', textTransform: 'uppercase', fontWeight: 700,
+            }}>Read Entry →</div>
+          </div>
+        </div>
+      </Link>
     </div>
   );
 }
@@ -310,7 +265,7 @@ function YearBlog({ yearOverview, phase }) {
         color: 'var(--phase-ink)',
         fontFamily: phase.fonts.body,
         fontWeight: phase.weights.body,
-        maxWidth: '680px', marginBottom: '36px',
+        marginBottom: '36px',
       }}>
         <ReactMarkdown
           components={{
@@ -498,7 +453,7 @@ export default function Timeline() {
   const [eventType,        setEventType]        = useState(null);
   const [member,           setMember]           = useState(initMember);
   const [activeStatFilter, setActiveStatFilter] = useState(null);
-  const [highlights,       setHighlights]       = useState([]);
+  const [leadEvent,        setLeadEvent]        = useState(null);
 
   const { setPhaseId } = usePhase();
   const phase = getPhaseForYear(selectedYear);
@@ -542,16 +497,16 @@ export default function Timeline() {
     [events, selectedYear]
   );
 
-  // Randomly pick up to 5 highlights when the year changes or data loads
+  // Randomly pick one lead event from milestone pool when year changes or data loads.
+  // Pool priority: is_milestone events → photo events → any event.
   useEffect(() => {
     if (yearEvents.length === 0) return;
-    // Score: photos = 2pts, body text = 1pt, plus random jitter for variety
-    const scored = yearEvents.map(e => ({
-      event: e,
-      score: (e.photos?.length > 0 ? 2 : 0) + (e.body ? 1 : 0) + Math.random(),
-    }));
-    scored.sort((a, b) => b.score - a.score);
-    setHighlights(scored.slice(0, 5).map(s => s.event));
+    const milestones = yearEvents.filter(e => e.is_milestone);
+    const withPhotos = yearEvents.filter(e => e.photos?.length > 0);
+    const pool = milestones.length > 0 ? milestones
+               : withPhotos.length > 0 ? withPhotos
+               : yearEvents;
+    setLeadEvent(pool[Math.floor(Math.random() * pool.length)]);
   }, [selectedYear, yearEvents.length]);
 
   const monthEvents = useMemo(() =>
@@ -653,7 +608,7 @@ export default function Timeline() {
               {/* ── Headline block ── */}
               {chapterTitle ? (
                 // Structured chapter title: year in muted grey + headline + subheading
-                <div style={{ marginBottom: '32px', maxWidth: '720px' }}>
+                <div style={{ marginBottom: '32px' }}>
                   <h1 style={{
                     fontFamily: phase.fonts.display,
                     fontSize: '48px',
@@ -683,7 +638,7 @@ export default function Timeline() {
                 </div>
               ) : (
                 // Plain year title + subtitle
-                <div style={{ marginBottom: '32px', maxWidth: '720px' }}>
+                <div style={{ marginBottom: '32px' }}>
                   <h1 style={{
                     fontFamily: phase.fonts.display,
                     fontSize: `${headlineSizePx}px`,
@@ -736,7 +691,7 @@ export default function Timeline() {
               ) : (
                 !isLoading && (
                   <>
-                    <YearHighlights highlights={highlights} phase={phase} />
+                    <LeadEntry event={leadEvent} phase={phase} />
                     <YearBlog yearOverview={yearOverview} phase={phase} year={selectedYear} />
                   </>
                 )
