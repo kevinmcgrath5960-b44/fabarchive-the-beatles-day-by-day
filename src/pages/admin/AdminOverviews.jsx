@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useToast } from '@/components/ui/use-toast';
+import MDEditor from '@uiw/react-md-editor';
+import '@uiw/react-md-editor/markdown-editor.css';
 
 const YEARS = Array.from({ length: 10 }, (_, i) => 1962 + i);
 const MONTH_NAMES = ['January', 'February', 'March', 'April', 'May', 'June',
@@ -23,25 +25,22 @@ export default function AdminOverviews() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const [tab, setTab] = useState('month'); // 'month' | 'year'
+  const [tab, setTab] = useState('month');
   const [selectedYear, setSelectedYear] = useState(1963);
   const [selectedMonth, setSelectedMonth] = useState(1);
   const [text, setText] = useState('');
   const [themes, setThemes] = useState('');
 
-  // ── Month overviews ──────────────────────────────────────────────────────────
   const { data: monthOverviews = [] } = useQuery({
     queryKey: ['month-overviews'],
     queryFn: () => base44.entities.MonthOverview.list(),
   });
 
-  // ── Year overviews ───────────────────────────────────────────────────────────
   const { data: yearOverviews = [] } = useQuery({
     queryKey: ['year-overviews'],
     queryFn: () => base44.entities.YearOverview.list(),
   });
 
-  // Populate fields when selection or data changes
   useEffect(() => {
     if (tab === 'month') {
       const existing = monthOverviews.find(o => o.year === selectedYear && o.month === selectedMonth);
@@ -54,7 +53,6 @@ export default function AdminOverviews() {
     }
   }, [tab, selectedYear, selectedMonth, monthOverviews, yearOverviews]);
 
-  // ── Save month ───────────────────────────────────────────────────────────────
   const saveMonthMutation = useMutation({
     mutationFn: async () => {
       const existing = monthOverviews.find(o => o.year === selectedYear && o.month === selectedMonth);
@@ -69,7 +67,6 @@ export default function AdminOverviews() {
     },
   });
 
-  // ── Save year ────────────────────────────────────────────────────────────────
   const saveYearMutation = useMutation({
     mutationFn: async () => {
       const existing = yearOverviews.find(o => o.year === selectedYear);
@@ -87,25 +84,26 @@ export default function AdminOverviews() {
   const isYear = tab === 'year';
   const isSaving = isYear ? saveYearMutation.isPending : saveMonthMutation.isPending;
   const handleSave = () => isYear ? saveYearMutation.mutate() : saveMonthMutation.mutate();
-
   const currentLabel = isYear
-    ? `${selectedYear}`
+    ? String(selectedYear)
     : `${MONTH_NAMES[selectedMonth - 1]} ${selectedYear}`;
 
   return (
-    <div>
+    <div data-color-mode="light">
+
       {/* ── Tab switcher ──────────────────────────────────────────────────────── */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0', marginBottom: '28px', borderBottom: '1px solid #E5E5E5' }}>
+      <div style={{ display: 'flex', borderBottom: '1px solid #E5E5E5', marginBottom: '24px' }}>
         {['month', 'year'].map(t => (
           <button
             key={t}
             onClick={() => setTab(t)}
             style={{
-              padding: '10px 22px', fontSize: '13px', fontWeight: tab === t ? 600 : 400,
+              padding: '10px 22px', fontSize: '13px',
+              fontWeight: tab === t ? 600 : 400,
               color: tab === t ? '#111111' : '#999999',
               background: 'none', border: 'none',
               borderBottom: tab === t ? '2px solid #C8102E' : '2px solid transparent',
-              cursor: 'pointer', marginBottom: '-1px', textTransform: 'capitalize',
+              cursor: 'pointer', marginBottom: '-1px',
             }}
           >
             {t === 'month' ? 'Month Overviews' : 'Year Overviews'}
@@ -113,68 +111,85 @@ export default function AdminOverviews() {
         ))}
       </div>
 
-      {/* ── Year picker (always shown) ────────────────────────────────────────── */}
-      <div style={{ marginBottom: '16px' }}>
-        <p style={{ fontSize: '11px', color: '#999999', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px' }}>Year</p>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-          {YEARS.map(y => (
-            <button key={y} onClick={() => setSelectedYear(y)} style={pillBtn(selectedYear === y)}>{y}</button>
-          ))}
-        </div>
-      </div>
+      {/* ── Two-column layout: controls left, editor right ────────────────────── */}
+      <div style={{ display: 'grid', gridTemplateColumns: '260px 1fr', gap: '40px', alignItems: 'flex-start' }}>
 
-      {/* ── Month picker (month tab only) ─────────────────────────────────────── */}
-      {!isYear && (
-        <div style={{ marginBottom: '20px' }}>
-          <p style={{ fontSize: '11px', color: '#999999', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px' }}>Month</p>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
-            {MONTH_NAMES.map((m, i) => (
-              <button key={i} onClick={() => setSelectedMonth(i + 1)} style={pillBtn(selectedMonth === i + 1)}>
-                {m.slice(0, 3)}
-              </button>
-            ))}
+        {/* ── LEFT: Pickers + themes + save ───────────────────────────────────── */}
+        <div>
+          <div style={{ marginBottom: '16px' }}>
+            <p style={{ fontSize: '11px', color: '#999999', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px' }}>Year</p>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+              {YEARS.map(y => (
+                <button key={y} onClick={() => setSelectedYear(y)} style={pillBtn(selectedYear === y)}>{y}</button>
+              ))}
+            </div>
+          </div>
+
+          {!isYear && (
+            <div style={{ marginBottom: '20px' }}>
+              <p style={{ fontSize: '11px', color: '#999999', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '8px' }}>Month</p>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                {MONTH_NAMES.map((m, i) => (
+                  <button key={i} onClick={() => setSelectedMonth(i + 1)} style={pillBtn(selectedMonth === i + 1)}>
+                    {m.slice(0, 3)}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div style={{ marginBottom: '16px' }}>
+            <label style={{ fontSize: '12px', color: '#444444', fontWeight: 500, display: 'block', marginBottom: '5px' }}>
+              Key Themes <span style={{ color: '#999', fontWeight: 400 }}>(comma-separated)</span>
+            </label>
+            <input
+              value={themes}
+              onChange={e => setThemes(e.target.value)}
+              style={inputStyle}
+              placeholder="e.g. Beatlemania, Abbey Road, Ed Sullivan"
+            />
+          </div>
+
+          <button
+            onClick={handleSave}
+            disabled={isSaving}
+            style={{
+              padding: '9px 20px', fontSize: '13px', fontWeight: 500,
+              background: '#C8102E', color: '#FFFFFF', border: 'none',
+              cursor: 'pointer', width: '100%',
+            }}
+          >
+            {isSaving ? 'Saving…' : `Save ${isYear ? 'Year' : 'Month'} Overview`}
+          </button>
+
+          {/* Hint */}
+          <div style={{ marginTop: '20px', padding: '12px', background: '#F9F9F9', border: '1px solid #EEEEEE' }}>
+            <p style={{ fontSize: '11px', color: '#666', lineHeight: 1.6, marginBottom: '6px', fontWeight: 600 }}>Markdown tips</p>
+            <p style={{ fontSize: '11px', color: '#888', lineHeight: 1.7, fontFamily: 'monospace' }}>
+              ## Section heading<br />
+              ### Sub-heading<br />
+              **bold** · *italic*<br />
+              {'> blockquote'}<br />
+              ---  (divider)<br />
+              ![caption|right](url)<br />
+              ![caption|half](url)<br />
+              ![caption|full](url)
+            </p>
           </div>
         </div>
-      )}
 
-      {/* ── Editor ───────────────────────────────────────────────────────────── */}
-      <div style={{ maxWidth: '640px' }}>
-        <h2 style={{ fontSize: '17px', fontWeight: 500, color: '#111111', marginBottom: '16px' }}>
-          {currentLabel}
-        </h2>
-
-        <div style={{ marginBottom: '14px' }}>
-          <label style={{ fontSize: '12px', color: '#444444', fontWeight: 500, display: 'block', marginBottom: '5px' }}>
-            Overview Text (Markdown)
-          </label>
-          <textarea
+        {/* ── RIGHT: MDEditor ───────────────────────────────────────────────────── */}
+        <div>
+          <p style={{ fontSize: '13px', fontWeight: 500, color: '#111', marginBottom: '10px' }}>
+            {currentLabel}
+          </p>
+          <MDEditor
             value={text}
-            onChange={e => setText(e.target.value)}
-            rows={isYear ? 16 : 8}
-            style={{ ...inputStyle, height: 'auto', padding: '8px 10px', resize: 'vertical', fontFamily: 'monospace', fontSize: '12px' }}
-            placeholder={isYear ? `What defined ${selectedYear} for the Beatles...` : 'What happened this month...'}
+            onChange={val => setText(val || '')}
+            height={680}
+            preview="live"
           />
         </div>
-
-        <div style={{ marginBottom: '20px' }}>
-          <label style={{ fontSize: '12px', color: '#444444', fontWeight: 500, display: 'block', marginBottom: '5px' }}>
-            Key Themes <span style={{ color: '#999', fontWeight: 400 }}>(comma-separated)</span>
-          </label>
-          <input
-            value={themes}
-            onChange={e => setThemes(e.target.value)}
-            style={inputStyle}
-            placeholder="e.g. Beatlemania, Please Please Me, Ed Sullivan"
-          />
-        </div>
-
-        <button
-          onClick={handleSave}
-          disabled={isSaving}
-          style={{ padding: '9px 20px', fontSize: '13px', fontWeight: 500, background: '#C8102E', color: '#FFFFFF', border: 'none', cursor: 'pointer' }}
-        >
-          {isSaving ? 'Saving…' : `Save ${isYear ? 'Year' : 'Month'} Overview`}
-        </button>
       </div>
     </div>
   );
