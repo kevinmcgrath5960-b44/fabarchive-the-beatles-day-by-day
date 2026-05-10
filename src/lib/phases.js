@@ -136,9 +136,14 @@ export const YEAR_IN_WORDS = {
 };
 
 // Chapter-style headlines for fully-developed years.
-// Falls back to YEAR_IN_WORDS for years not yet in this map.
+// headline = shown after the year number in the h1
+// subheading = replaces YEAR_SUBTITLES for this year
+// Falls back to YEAR_IN_WORDS + YEAR_SUBTITLES for years not in this map.
 export const YEAR_CHAPTER_TITLES = {
-  1963: '1963: Chart Success to Super Stardom — The Year Beatlemania Swept the Nation',
+  1963: {
+    headline: 'Chart Success to Super Stardom',
+    subheading: 'The Year Beatlemania Swept the Nation',
+  },
 };
 
 // Short evocative year subtitles shown below the big year title

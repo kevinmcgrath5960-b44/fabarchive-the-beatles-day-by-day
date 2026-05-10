@@ -12,7 +12,7 @@ import { usePhase } from '@/lib/PhaseContext';
 const MONTH_NAMES = ['', 'January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December'];
 
-// Stat card definitions — label shown to user, type matched to event_type field
+// Stat card definitions
 const STAT_TYPE_MAP = [
   { label: 'Recording Sessions', type: 'Recording Session' },
   { label: 'Live Shows',         type: 'Live Performance' },
@@ -20,7 +20,7 @@ const STAT_TYPE_MAP = [
   { label: 'Media / TV',         type: 'Media Appearance' },
 ];
 
-// ── Phase decoration (between month groups) ───────────────────────────────────
+// ── Phase decoration ──────────────────────────────────────────────────────────
 function PhaseDecoration({ decoration, mmtPalette }) {
   if (decoration === 'asterisks') {
     return (
@@ -40,7 +40,7 @@ function PhaseDecoration({ decoration, mmtPalette }) {
   return <div style={{ height: '1px', background: 'var(--phase-accent)', margin: '20px 0', opacity: 0.35 }} />;
 }
 
-// ── Event row — big day | title+excerpt | type+location right-aligned ─────────
+// ── Event row ─────────────────────────────────────────────────────────────────
 function EventRow({ event, phase }) {
   const [hovered, setHovered] = useState(false);
   const d = event.date ? new Date(event.date) : null;
@@ -63,7 +63,6 @@ function EventRow({ event, phase }) {
           borderTop: '1px solid var(--phase-surface)',
         }}
       >
-        {/* Day + Month */}
         <div style={{ textAlign: 'center', paddingTop: '1px' }}>
           {approxStr ? (
             <div style={{ fontFamily: '"Inter", sans-serif', fontSize: '10px', color: 'var(--phase-muted)', lineHeight: 1.4 }}>
@@ -91,7 +90,6 @@ function EventRow({ event, phase }) {
           )}
         </div>
 
-        {/* Title + excerpt */}
         <div style={{ minWidth: 0 }}>
           <h3 style={{
             fontSize: '14px',
@@ -116,7 +114,6 @@ function EventRow({ event, phase }) {
           )}
         </div>
 
-        {/* Type + location — right-aligned */}
         <div style={{ textAlign: 'right', paddingTop: '2px' }}>
           {event.event_type && (
             <div style={{
@@ -144,88 +141,117 @@ function EventRow({ event, phase }) {
   );
 }
 
-// ── Lead entry — featured event card ─────────────────────────────────────────
-function LeadEntry({ event, phase }) {
-  if (!event) return null;
-  const d = event.date ? new Date(event.date) : null;
-  const dateLabel = d ? format(d, 'd MMMM').toUpperCase() : '';
-  const hasPhoto = event.photos?.length > 0;
+// ── Year highlights — random selection of up to 5 notable events ──────────────
+function YearHighlights({ highlights, phase }) {
+  if (!highlights.length) return null;
 
   return (
-    <div style={{ marginBottom: '48px' }}>
+    <div style={{ marginBottom: '52px' }}>
       <p style={{
-        fontSize: '9px',
-        fontFamily: '"Inter", sans-serif',
-        letterSpacing: '0.14em',
-        textTransform: 'uppercase',
-        color: 'var(--phase-muted)',
-        marginBottom: '14px',
-        fontWeight: 500,
+        fontSize: '9px', fontFamily: '"Inter", sans-serif',
+        letterSpacing: '0.18em', textTransform: 'uppercase',
+        color: 'var(--phase-muted)', marginBottom: '4px', fontWeight: 500,
       }}>
-        ★ Lead Entry · {dateLabel}
+        Year Highlights
       </p>
-      <Link to={`/event/${event.id}`} style={{ textDecoration: 'none', display: 'block' }}>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: hasPhoto ? '1fr 1fr' : '1fr',
-          border: '1px solid var(--phase-surface)',
-        }}>
-          {hasPhoto && (
-            <div>
-              <img
-                src={event.photos[0].url}
-                alt={event.title}
-                style={{ width: '100%', height: '260px', objectFit: 'cover', display: 'block' }}
-              />
-              {event.photos[0].caption && (
-                <p style={{
+      <p style={{
+        fontSize: '10px', fontFamily: '"Inter", sans-serif',
+        color: 'var(--phase-muted)', marginBottom: '20px', opacity: 0.55,
+        letterSpacing: '0.04em',
+      }}>
+        A selection of notable moments — refreshes each visit
+      </p>
+
+      {highlights.map((event, i) => {
+        const d = event.date ? new Date(event.date) : null;
+        const dateLabel = d ? format(d, 'd MMMM').toUpperCase() : '';
+        const hasPhoto = event.photos?.length > 0;
+
+        return (
+          <Link key={event.id} to={`/event/${event.id}`} style={{ textDecoration: 'none', display: 'block' }}>
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: hasPhoto ? '120px 1fr' : '36px 1fr',
+                gap: '20px',
+                alignItems: 'flex-start',
+                padding: '18px 0',
+                borderTop: i === 0 ? '2px solid var(--phase-accent)' : '1px solid var(--phase-surface)',
+                transition: 'opacity 0.15s',
+              }}
+              onMouseEnter={e => e.currentTarget.style.opacity = '0.75'}
+              onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+            >
+              {/* Photo thumbnail or index number */}
+              {hasPhoto ? (
+                <div style={{ position: 'relative' }}>
+                  <img
+                    src={event.photos[0].url}
+                    alt={event.title}
+                    style={{ width: '120px', height: '80px', objectFit: 'cover', display: 'block' }}
+                  />
+                  <div style={{
+                    position: 'absolute', top: '6px', left: '6px',
+                    background: 'var(--phase-accent)', color: 'var(--phase-bg)',
+                    fontFamily: '"Inter", sans-serif', fontSize: '9px',
+                    fontWeight: 700, padding: '2px 6px', letterSpacing: '0.06em',
+                  }}>
+                    {String(i + 1).padStart(2, '0')}
+                  </div>
+                </div>
+              ) : (
+                <div style={{
+                  fontFamily: phase.fonts.display,
+                  fontSize: '32px',
+                  fontWeight: 700,
+                  color: 'var(--phase-muted)',
+                  opacity: 0.3,
+                  lineHeight: 1,
+                  paddingTop: '2px',
+                }}>
+                  {String(i + 1).padStart(2, '0')}
+                </div>
+              )}
+
+              {/* Content */}
+              <div>
+                <div style={{
                   fontSize: '9px',
                   fontFamily: '"Inter", sans-serif',
-                  color: 'var(--phase-muted)',
+                  color: 'var(--phase-accent)',
                   letterSpacing: '0.1em',
                   textTransform: 'uppercase',
-                  padding: '8px 12px',
-                  background: 'var(--phase-surface)',
-                }}>Photographed · {event.photos[0].caption}</p>
-              )}
+                  fontWeight: 600,
+                  marginBottom: '5px',
+                }}>
+                  {dateLabel}
+                  {event.event_type && <span style={{ color: 'var(--phase-muted)', fontWeight: 400, marginLeft: '8px' }}>· {event.event_type}</span>}
+                </div>
+                <h3 style={{
+                  fontSize: '16px',
+                  fontFamily: phase.fonts.body,
+                  fontWeight: 500,
+                  color: 'var(--phase-ink)',
+                  lineHeight: 1.3,
+                  marginBottom: event.body ? '6px' : 0,
+                }}>{event.title}</h3>
+                {event.body && (
+                  <p style={{
+                    fontSize: '12px',
+                    fontFamily: '"Inter", sans-serif',
+                    color: 'var(--phase-muted)',
+                    lineHeight: 1.6,
+                    overflow: 'hidden',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical',
+                  }}>{event.body.substring(0, 180)}</p>
+                )}
+              </div>
             </div>
-          )}
-          <div style={{ padding: '28px' }}>
-            <h2 style={{
-              fontFamily: phase.fonts.display,
-              fontSize: '26px',
-              fontWeight: phase.weights.display,
-              color: 'var(--phase-ink)',
-              lineHeight: 1.2,
-              marginBottom: '14px',
-            }}>{event.title}</h2>
-            {event.body && (
-              <p style={{
-                fontSize: '13px',
-                fontFamily: '"Inter", sans-serif',
-                color: 'var(--phase-muted)',
-                lineHeight: 1.7,
-                marginBottom: '22px',
-                overflow: 'hidden',
-                display: '-webkit-box',
-                WebkitLineClamp: 4,
-                WebkitBoxOrient: 'vertical',
-              }}>{event.body.substring(0, 320)}</p>
-            )}
-            <div style={{
-              display: 'inline-block',
-              padding: '9px 18px',
-              background: 'var(--phase-ink)',
-              color: 'var(--phase-bg)',
-              fontSize: '10px',
-              fontFamily: '"Inter", sans-serif',
-              letterSpacing: '0.12em',
-              textTransform: 'uppercase',
-              fontWeight: 700,
-            }}>Read Entry →</div>
-          </div>
-        </div>
-      </Link>
+          </Link>
+        );
+      })}
     </div>
   );
 }
@@ -241,14 +267,12 @@ function ImagePlaceholder({ aspect = '16/9', label = 'Photograph' }) {
       flexDirection: 'column',
       alignItems: 'center',
       justifyContent: 'center',
-      marginBottom: '0',
     }}>
       <div style={{
         width: '32px', height: '32px', borderRadius: '50%',
         border: '1px solid var(--phase-muted)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
-        marginBottom: '8px',
-        opacity: 0.4,
+        marginBottom: '8px', opacity: 0.4,
       }}>
         <span style={{ fontSize: '14px', color: 'var(--phase-muted)' }}>◎</span>
       </div>
@@ -261,8 +285,8 @@ function ImagePlaceholder({ aspect = '16/9', label = 'Photograph' }) {
   );
 }
 
-// ── Year blog — full narrative view replacing the day list ────────────────────
-function YearBlog({ yearOverview, phase, year }) {
+// ── Year blog narrative ───────────────────────────────────────────────────────
+function YearBlog({ yearOverview, phase }) {
   if (!yearOverview) return null;
 
   const themes = yearOverview.key_themes
@@ -271,39 +295,28 @@ function YearBlog({ yearOverview, phase, year }) {
 
   return (
     <div>
-      {/* Section label */}
       <p style={{
         fontSize: '9px', fontFamily: '"Inter", sans-serif',
         letterSpacing: '0.18em', textTransform: 'uppercase',
         color: 'var(--phase-muted)', marginBottom: '20px', fontWeight: 500,
       }}>The Year in Full</p>
 
-      {/* Hero image placeholder */}
       <div style={{ marginBottom: '32px', border: '1px solid var(--phase-surface)' }}>
         <ImagePlaceholder aspect="21/9" label="Year in photographs" />
       </div>
 
-      {/* Narrative prose */}
       <div style={{
-        fontSize: '15px',
-        lineHeight: 1.9,
+        fontSize: '15px', lineHeight: 1.9,
         color: 'var(--phase-ink)',
         fontFamily: phase.fonts.body,
         fontWeight: phase.weights.body,
-        maxWidth: '680px',
-        marginBottom: '36px',
+        maxWidth: '680px', marginBottom: '36px',
       }}>
         <ReactMarkdown
           components={{
-            p: ({ children }) => (
-              <p style={{ marginBottom: '1.4em' }}>{children}</p>
-            ),
-            strong: ({ children }) => (
-              <strong style={{ color: 'var(--phase-ink)', fontWeight: 600 }}>{children}</strong>
-            ),
-            em: ({ children }) => (
-              <em style={{ fontStyle: 'italic', color: 'var(--phase-ink)' }}>{children}</em>
-            ),
+            p: ({ children }) => <p style={{ marginBottom: '1.4em' }}>{children}</p>,
+            strong: ({ children }) => <strong style={{ color: 'var(--phase-ink)', fontWeight: 600 }}>{children}</strong>,
+            em: ({ children }) => <em style={{ fontStyle: 'italic', color: 'var(--phase-ink)' }}>{children}</em>,
             h1: ({ children }) => <p style={{ fontWeight: 600, marginBottom: '1em' }}>{children}</p>,
             h2: ({ children }) => <p style={{ fontWeight: 600, marginBottom: '1em' }}>{children}</p>,
             h3: ({ children }) => <p style={{ fontWeight: 600, marginBottom: '1em' }}>{children}</p>,
@@ -313,7 +326,6 @@ function YearBlog({ yearOverview, phase, year }) {
         </ReactMarkdown>
       </div>
 
-      {/* Inline image placeholders */}
       <div style={{
         display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2px',
         marginBottom: '36px', border: '1px solid var(--phase-surface)',
@@ -322,7 +334,6 @@ function YearBlog({ yearOverview, phase, year }) {
         <ImagePlaceholder aspect="4/3" label="Live" />
       </div>
 
-      {/* Key themes chips */}
       {themes.length > 0 && (
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '16px' }}>
           <span style={{
@@ -340,7 +351,6 @@ function YearBlog({ yearOverview, phase, year }) {
         </div>
       )}
 
-      {/* Prompt to explore months */}
       <div style={{
         marginTop: '40px', paddingTop: '20px',
         borderTop: '1px solid var(--phase-surface)',
@@ -358,11 +368,10 @@ function YearBlog({ yearOverview, phase, year }) {
   );
 }
 
-// ── Stat-filtered event list — shown when a stat card is active ───────────────
+// ── Stat-filtered event list ──────────────────────────────────────────────────
 function StatFilteredList({ events, phase, label, onClear }) {
   return (
     <div>
-      {/* Header row */}
       <div style={{
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         marginBottom: '20px',
@@ -389,7 +398,6 @@ function StatFilteredList({ events, phase, label, onClear }) {
           × Clear filter
         </button>
       </div>
-
       {events.length === 0 ? (
         <p style={{ fontSize: '13px', color: 'var(--phase-muted)', fontFamily: '"Inter", sans-serif', padding: '40px 0', textAlign: 'center' }}>
           No {label.toLowerCase()} this year.
@@ -410,43 +418,29 @@ function PhaseRibbon({ phase, yearEvents, filteredEvents, selectedMonth }) {
   const isYearView = !selectedMonth;
   return (
     <div style={{
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'space-between',
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       padding: '14px 0 12px',
       borderBottom: '1px solid var(--phase-surface)',
-      marginBottom: '32px',
-      flexWrap: 'wrap',
-      gap: '8px',
+      marginBottom: '32px', flexWrap: 'wrap', gap: '8px',
     }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
         <span style={{
-          background: 'var(--phase-accent)',
-          color: 'var(--phase-bg)',
-          fontSize: '9px',
-          letterSpacing: '0.14em',
-          textTransform: 'uppercase',
-          fontFamily: '"Inter", sans-serif',
-          fontWeight: 700,
-          padding: '4px 10px',
-          whiteSpace: 'nowrap',
+          background: 'var(--phase-accent)', color: 'var(--phase-bg)',
+          fontSize: '9px', letterSpacing: '0.14em', textTransform: 'uppercase',
+          fontFamily: '"Inter", sans-serif', fontWeight: 700,
+          padding: '4px 10px', whiteSpace: 'nowrap',
         }}>
           Phase · {phase.label} · {phase.sublabel}
         </span>
         <span style={{
-          fontSize: '11px',
-          color: 'var(--phase-muted)',
-          fontFamily: '"Inter", sans-serif',
-          letterSpacing: '0.05em',
+          fontSize: '11px', color: 'var(--phase-muted)',
+          fontFamily: '"Inter", sans-serif', letterSpacing: '0.05em',
         }}>{phase.years}</span>
       </div>
       <span style={{
-        fontSize: '10px',
-        color: 'var(--phase-muted)',
-        fontFamily: '"Inter", sans-serif',
-        letterSpacing: '0.1em',
-        textTransform: 'uppercase',
-        whiteSpace: 'nowrap',
+        fontSize: '10px', color: 'var(--phase-muted)',
+        fontFamily: '"Inter", sans-serif', letterSpacing: '0.1em',
+        textTransform: 'uppercase', whiteSpace: 'nowrap',
       }}>
         {isYearView
           ? `${yearEvents.length} entries · Whole Year`
@@ -467,32 +461,23 @@ function StatStrip({ stats, activeType, onStatClick }) {
             key={label}
             onClick={() => onStatClick(type)}
             style={{
-              padding: '20px 16px',
-              textAlign: 'center',
+              padding: '20px 16px', textAlign: 'center',
               border: '1px solid var(--phase-surface)',
               borderLeft: i > 0 ? 'none' : '1px solid var(--phase-surface)',
               background: isActive ? 'var(--phase-accent)' : 'transparent',
-              cursor: 'pointer',
-              transition: 'background 0.2s ease',
-              outline: 'none',
+              cursor: 'pointer', transition: 'background 0.2s ease', outline: 'none',
             }}
           >
             <div style={{
               fontFamily: 'var(--phase-font-display, serif)',
-              fontSize: '44px',
-              fontWeight: 700,
+              fontSize: '44px', fontWeight: 700,
               color: isActive ? 'var(--phase-bg)' : 'var(--phase-ink)',
-              lineHeight: 1,
-              marginBottom: '8px',
-              transition: 'color 0.2s ease',
+              lineHeight: 1, marginBottom: '8px', transition: 'color 0.2s ease',
             }}>{count}</div>
             <div style={{
-              fontSize: '9px',
-              fontFamily: '"Inter", sans-serif',
+              fontSize: '9px', fontFamily: '"Inter", sans-serif',
               color: isActive ? 'var(--phase-bg)' : 'var(--phase-muted)',
-              textTransform: 'uppercase',
-              letterSpacing: '0.1em',
-              fontWeight: 500,
+              textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 500,
               transition: 'color 0.2s ease',
             }}>{label}</div>
           </button>
@@ -508,11 +493,12 @@ export default function Timeline() {
   const initYear   = params.get('year')   ? Number(params.get('year')) : 1962;
   const initMember = params.get('member') || null;
 
-  const [selectedYear,    setSelectedYear]    = useState(initYear);
-  const [selectedMonth,   setSelectedMonth]   = useState(null);
-  const [eventType,       setEventType]       = useState(null);
-  const [member,          setMember]          = useState(initMember);
+  const [selectedYear,     setSelectedYear]     = useState(initYear);
+  const [selectedMonth,    setSelectedMonth]    = useState(null);
+  const [eventType,        setEventType]        = useState(null);
+  const [member,           setMember]           = useState(initMember);
   const [activeStatFilter, setActiveStatFilter] = useState(null);
+  const [highlights,       setHighlights]       = useState([]);
 
   const { setPhaseId } = usePhase();
   const phase = getPhaseForYear(selectedYear);
@@ -556,7 +542,18 @@ export default function Timeline() {
     [events, selectedYear]
   );
 
-  // All events in the selected month (unfiltered by type/member — used for stat counts)
+  // Randomly pick up to 5 highlights when the year changes or data loads
+  useEffect(() => {
+    if (yearEvents.length === 0) return;
+    // Score: photos = 2pts, body text = 1pt, plus random jitter for variety
+    const scored = yearEvents.map(e => ({
+      event: e,
+      score: (e.photos?.length > 0 ? 2 : 0) + (e.body ? 1 : 0) + Math.random(),
+    }));
+    scored.sort((a, b) => b.score - a.score);
+    setHighlights(scored.slice(0, 5).map(s => s.event));
+  }, [selectedYear, yearEvents.length]);
+
   const monthEvents = useMemo(() =>
     selectedMonth
       ? yearEvents.filter(e => new Date(e.date).getMonth() + 1 === selectedMonth)
@@ -564,35 +561,28 @@ export default function Timeline() {
     [yearEvents, selectedMonth]
   );
 
-  // Year-level stats
   const typeStats = useMemo(() =>
     STAT_TYPE_MAP.map(({ label, type }) => ({
-      label,
-      type,
+      label, type,
       count: yearEvents.filter(e => e.event_type === type).length,
     })),
     [yearEvents]
   );
 
-  // Month-level stats (reflect selected month only)
   const monthStats = useMemo(() =>
     STAT_TYPE_MAP.map(({ label, type }) => ({
-      label,
-      type,
+      label, type,
       count: monthEvents.filter(e => e.event_type === type).length,
     })),
     [monthEvents]
   );
 
-  // Events displayed in the list — respects all active filters
   const filteredEvents = useMemo(() => {
     if (!selectedMonth) {
-      // Year view: only activeStatFilter applies here (shown in StatFilteredList)
       return activeStatFilter
         ? yearEvents.filter(e => e.event_type === activeStatFilter)
         : yearEvents;
     }
-    // Month view: month + optional type/member from FilterBar + optional stat card filter
     return yearEvents.filter(e => {
       if (new Date(e.date).getMonth() + 1 !== selectedMonth) return false;
       if (eventType && e.event_type !== eventType) return false;
@@ -602,28 +592,21 @@ export default function Timeline() {
     });
   }, [yearEvents, selectedMonth, eventType, member, activeStatFilter]);
 
-  const leadEvent = useMemo(() =>
-    yearEvents.find(e => e.photos?.length > 0) || yearEvents[0],
-    [yearEvents]
-  );
-
   const isYearView = !selectedMonth;
   const headlineSizePx = Math.min(phase.headlineSizePx, 68);
+  const chapterTitle = YEAR_CHAPTER_TITLES[selectedYear]; // object or undefined
 
-  // Toggle a stat card — click again to deselect
   const handleStatClick = (type) => {
     setActiveStatFilter(prev => prev === type ? null : type);
   };
 
-  // Derive month chapter heading from MonthOverview key_themes or fallback to month name
   const monthChapterHeading = useMemo(() => {
     if (!selectedMonth) return null;
     if (monthOverview?.key_themes) {
-      // Use first theme as a punchy subheading, or the whole string if short
       const themes = monthOverview.key_themes.split(',').map(t => t.trim()).filter(Boolean);
       if (themes.length > 0 && themes[0].length < 80) return themes[0];
     }
-    return `${MONTH_NAMES[selectedMonth]} ${selectedYear}`;
+    return null;
   }, [selectedMonth, selectedYear, monthOverview]);
 
   return (
@@ -667,32 +650,65 @@ export default function Timeline() {
           {/* ═══ YEAR OVERVIEW ═══════════════════════════════════════════ */}
           {isYearView && (
             <>
-              <h1 style={{
-                fontFamily: phase.fonts.display,
-                fontSize: YEAR_CHAPTER_TITLES[selectedYear] ? '32px' : `${headlineSizePx}px`,
-                fontWeight: phase.weights.display,
-                color: 'var(--phase-ink)',
-                lineHeight: YEAR_CHAPTER_TITLES[selectedYear] ? 1.2 : phase.headlineLineHeight,
-                letterSpacing: phase.headlineTracking,
-                textTransform: phase.headlineCase,
-                marginBottom: '10px',
-                maxWidth: '720px',
-              }}>
-                {YEAR_CHAPTER_TITLES[selectedYear] || YEAR_IN_WORDS[selectedYear]}
-              </h1>
+              {/* ── Headline block ── */}
+              {chapterTitle ? (
+                // Structured chapter title: year in muted grey + headline + subheading
+                <div style={{ marginBottom: '32px', maxWidth: '720px' }}>
+                  <h1 style={{
+                    fontFamily: phase.fonts.display,
+                    fontSize: '48px',
+                    fontWeight: phase.weights.display,
+                    color: 'var(--phase-ink)',
+                    lineHeight: 1.15,
+                    letterSpacing: phase.headlineTracking,
+                    textTransform: phase.headlineCase,
+                    marginBottom: '10px',
+                  }}>
+                    <span style={{ color: 'var(--phase-muted)', opacity: 0.45, fontWeight: 400 }}>
+                      {selectedYear}
+                    </span>
+                    {' – '}
+                    {chapterTitle.headline}
+                  </h1>
+                  <p style={{
+                    fontSize: '17px',
+                    fontStyle: 'italic',
+                    color: 'var(--phase-muted)',
+                    fontFamily: phase.fonts.body,
+                    lineHeight: 1.45,
+                    letterSpacing: '0.01em',
+                  }}>
+                    {chapterTitle.subheading}
+                  </p>
+                </div>
+              ) : (
+                // Plain year title + subtitle
+                <div style={{ marginBottom: '32px', maxWidth: '720px' }}>
+                  <h1 style={{
+                    fontFamily: phase.fonts.display,
+                    fontSize: `${headlineSizePx}px`,
+                    fontWeight: phase.weights.display,
+                    color: 'var(--phase-ink)',
+                    lineHeight: phase.headlineLineHeight,
+                    letterSpacing: phase.headlineTracking,
+                    textTransform: phase.headlineCase,
+                    marginBottom: '10px',
+                  }}>
+                    {YEAR_IN_WORDS[selectedYear]}
+                  </h1>
+                  <p style={{
+                    fontSize: '15px',
+                    fontStyle: 'italic',
+                    color: 'var(--phase-muted)',
+                    fontFamily: phase.fonts.body,
+                    lineHeight: 1.5,
+                  }}>
+                    {YEAR_SUBTITLES[selectedYear]}
+                  </p>
+                </div>
+              )}
 
-              <p style={{
-                fontSize: '15px',
-                fontStyle: 'italic',
-                color: 'var(--phase-muted)',
-                fontFamily: phase.fonts.body,
-                lineHeight: 1.5,
-                marginBottom: '32px',
-              }}>
-                {YEAR_SUBTITLES[selectedYear]}
-              </p>
-
-              {/* Stat strip — interactive */}
+              {/* Stat strip */}
               {!isLoading && (
                 <StatStrip
                   stats={typeStats}
@@ -709,7 +725,7 @@ export default function Timeline() {
                 </div>
               )}
 
-              {/* Stat-filtered list OR normal year view */}
+              {/* Stat-filtered list OR highlights + year blog */}
               {!isLoading && activeStatFilter ? (
                 <StatFilteredList
                   events={filteredEvents}
@@ -720,15 +736,8 @@ export default function Timeline() {
               ) : (
                 !isLoading && (
                   <>
-                    {/* Lead entry */}
-                    {leadEvent && <LeadEntry event={leadEvent} phase={phase} />}
-
-                    {/* Year blog narrative */}
-                    <YearBlog
-                      yearOverview={yearOverview}
-                      phase={phase}
-                      year={selectedYear}
-                    />
+                    <YearHighlights highlights={highlights} phase={phase} />
+                    <YearBlog yearOverview={yearOverview} phase={phase} year={selectedYear} />
                   </>
                 )
               )}
@@ -738,7 +747,6 @@ export default function Timeline() {
           {/* ═══ MONTH VIEW ══════════════════════════════════════════════ */}
           {!isYearView && (
             <>
-              {/* Month heading — derived from MonthOverview key_themes */}
               <div style={{ marginBottom: '20px' }}>
                 <h1 style={{
                   fontFamily: phase.fonts.display,
@@ -751,21 +759,17 @@ export default function Timeline() {
                   <span style={{ opacity: 0.45, fontWeight: 400 }}>{selectedYear} · </span>
                   {MONTH_NAMES[selectedMonth]}
                 </h1>
-                {monthChapterHeading && monthChapterHeading !== `${MONTH_NAMES[selectedMonth]} ${selectedYear}` && (
+                {monthChapterHeading && (
                   <p style={{
-                    fontSize: '14px',
-                    fontStyle: 'italic',
-                    color: 'var(--phase-muted)',
-                    fontFamily: phase.fonts.body,
-                    lineHeight: 1.4,
-                    marginTop: '6px',
+                    fontSize: '14px', fontStyle: 'italic',
+                    color: 'var(--phase-muted)', fontFamily: phase.fonts.body,
+                    lineHeight: 1.4, marginTop: '6px',
                   }}>
                     {monthChapterHeading}
                   </p>
                 )}
               </div>
 
-              {/* Month stat strip — counts reflect selected month only */}
               {!isLoading && (
                 <StatStrip
                   stats={monthStats}
@@ -774,7 +778,6 @@ export default function Timeline() {
                 />
               )}
 
-              {/* FilterBar — hidden when stat card is active (stat card IS the filter) */}
               {!activeStatFilter && (
                 <FilterBar
                   eventType={eventType}
@@ -784,12 +787,8 @@ export default function Timeline() {
                 />
               )}
 
-              {/* Active stat filter indicator */}
               {activeStatFilter && (
-                <div style={{
-                  display: 'flex', alignItems: 'center', gap: '10px',
-                  marginBottom: '20px',
-                }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '20px' }}>
                   <span style={{
                     fontSize: '9px', fontFamily: '"Inter", sans-serif',
                     letterSpacing: '0.12em', textTransform: 'uppercase',
@@ -833,14 +832,10 @@ export default function Timeline() {
                     <EventRow key={event.id} event={event} phase={phase} />
                   ))}
                   <p style={{
-                    fontSize: '10px',
-                    color: 'var(--phase-muted)',
-                    marginTop: '28px',
-                    textAlign: 'center',
-                    letterSpacing: '0.1em',
-                    textTransform: 'uppercase',
-                    fontFamily: '"Inter", sans-serif',
-                    opacity: 0.6,
+                    fontSize: '10px', color: 'var(--phase-muted)',
+                    marginTop: '28px', textAlign: 'center',
+                    letterSpacing: '0.1em', textTransform: 'uppercase',
+                    fontFamily: '"Inter", sans-serif', opacity: 0.6,
                   }}>
                     {filteredEvents.length} event{filteredEvents.length !== 1 ? 's' : ''}
                   </p>
